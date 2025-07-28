@@ -1,8 +1,8 @@
 import React from 'react';
 import PlaceholderPage from '../components/common/PlaceholderPage';
 
-// Páginas de autenticación
-export const LoginPage = () => <PlaceholderPage title="Login" subtitle="Página de inicio de sesión" />;
+// Páginas de autenticación - LoginPage real
+export { default as LoginPage } from './auth/LoginPage';
 export const RegisterPage = () => <PlaceholderPage title="Registro" subtitle="Crear nueva cuenta" />;
 export const ForgotPasswordPage = () => <PlaceholderPage title="Recuperar Contraseña" subtitle="Restablecer contraseña" />;
 
