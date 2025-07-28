@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 
 // Estado inicial
 const initialState = {
@@ -13,16 +13,16 @@ const initialState = {
 
 // Tipos de acciones
 const AUTH_ACTIONS = {
-  LOGIN_START: 'LOGIN_START',
-  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
-  LOGIN_FAILURE: 'LOGIN_FAILURE',
-  LOGOUT: 'LOGOUT',
-  REGISTER_START: 'REGISTER_START',
-  REGISTER_SUCCESS: 'REGISTER_SUCCESS',
-  REGISTER_FAILURE: 'REGISTER_FAILURE',
-  UPDATE_USER: 'UPDATE_USER',
-  CLEAR_ERROR: 'CLEAR_ERROR',
-  SET_LOADING: 'SET_LOADING',
+  LOGIN_START: "LOGIN_START",
+  LOGIN_SUCCESS: "LOGIN_SUCCESS",
+  LOGIN_FAILURE: "LOGIN_FAILURE",
+  LOGOUT: "LOGOUT",
+  REGISTER_START: "REGISTER_START",
+  REGISTER_SUCCESS: "REGISTER_SUCCESS",
+  REGISTER_FAILURE: "REGISTER_FAILURE",
+  UPDATE_USER: "UPDATE_USER",
+  CLEAR_ERROR: "CLEAR_ERROR",
+  SET_LOADING: "SET_LOADING",
 };
 
 // Reducer
@@ -107,7 +107,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
+    throw new Error("useAuth debe ser usado dentro de AuthProvider");
   }
   return context;
 };
@@ -119,14 +119,15 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // API Base URL
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
   // Función para hacer peticiones HTTP
   const apiRequest = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
@@ -142,12 +143,12 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || data.message || 'Error en la petición');
+        throw new Error(data.detail || data.message || "Error en la petición");
       }
 
       return data;
     } catch (error) {
-      console.error('API Request Error:', error);
+      console.error("API Request Error:", error);
       throw error;
     }
   };
@@ -158,23 +159,23 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const formData = new FormData();
-      formData.append('username', credentials.email);
-      formData.append('password', credentials.password);
+      formData.append("username", credentials.email);
+      formData.append("password", credentials.password);
 
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Error al iniciar sesión');
+        throw new Error(data.detail || "Error al iniciar sesión");
       }
 
       // Guardar token en localStorage
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
@@ -184,8 +185,8 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      enqueueSnackbar('Sesión iniciada correctamente', { variant: 'success' });
-      navigate('/dashboard');
+      enqueueSnackbar("Sesión iniciada correctamente", { variant: "success" });
+      navigate("/dashboard");
 
       return data;
     } catch (error) {
@@ -193,7 +194,7 @@ export const AuthProvider = ({ children }) => {
         type: AUTH_ACTIONS.LOGIN_FAILURE,
         payload: error.message,
       });
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar(error.message, { variant: "error" });
       throw error;
     }
   };
@@ -203,14 +204,14 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.REGISTER_START });
 
     try {
-      const data = await apiRequest('/auth/register', {
-        method: 'POST',
+      const data = await apiRequest("/auth/register", {
+        method: "POST",
         body: JSON.stringify(userData),
       });
 
       // Guardar token en localStorage
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       dispatch({
         type: AUTH_ACTIONS.REGISTER_SUCCESS,
@@ -220,8 +221,8 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      enqueueSnackbar('Cuenta creada correctamente', { variant: 'success' });
-      navigate('/dashboard');
+      enqueueSnackbar("Cuenta creada correctamente", { variant: "success" });
+      navigate("/dashboard");
 
       return data;
     } catch (error) {
@@ -229,7 +230,7 @@ export const AuthProvider = ({ children }) => {
         type: AUTH_ACTIONS.REGISTER_FAILURE,
         payload: error.message,
       });
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar(error.message, { variant: "error" });
       throw error;
     }
   };
@@ -239,28 +240,28 @@ export const AuthProvider = ({ children }) => {
     try {
       // Intentar hacer logout en el servidor
       if (state.token) {
-        await apiRequest('/auth/logout', {
-          method: 'POST',
+        await apiRequest("/auth/logout", {
+          method: "POST",
         });
       }
     } catch (error) {
-      console.error('Error al hacer logout en el servidor:', error);
+      console.error("Error al hacer logout en el servidor:", error);
     } finally {
       // Limpiar localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
-      enqueueSnackbar('Sesión cerrada', { variant: 'info' });
-      navigate('/login');
+      enqueueSnackbar("Sesión cerrada", { variant: "info" });
+      navigate("/login");
     }
   };
 
   // Función para actualizar perfil
   const updateProfile = async (profileData) => {
     try {
-      const data = await apiRequest('/auth/profile', {
-        method: 'PUT',
+      const data = await apiRequest("/auth/profile", {
+        method: "PUT",
         body: JSON.stringify(profileData),
       });
 
@@ -270,12 +271,14 @@ export const AuthProvider = ({ children }) => {
       });
 
       // Actualizar localStorage
-      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem("user", JSON.stringify(data));
 
-      enqueueSnackbar('Perfil actualizado correctamente', { variant: 'success' });
+      enqueueSnackbar("Perfil actualizado correctamente", {
+        variant: "success",
+      });
       return data;
     } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar(error.message, { variant: "error" });
       throw error;
     }
   };
@@ -283,14 +286,16 @@ export const AuthProvider = ({ children }) => {
   // Función para cambiar contraseña
   const changePassword = async (passwordData) => {
     try {
-      await apiRequest('/auth/change-password', {
-        method: 'POST',
+      await apiRequest("/auth/change-password", {
+        method: "POST",
         body: JSON.stringify(passwordData),
       });
 
-      enqueueSnackbar('Contraseña cambiada correctamente', { variant: 'success' });
+      enqueueSnackbar("Contraseña cambiada correctamente", {
+        variant: "success",
+      });
     } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar(error.message, { variant: "error" });
       throw error;
     }
   };
@@ -298,14 +303,16 @@ export const AuthProvider = ({ children }) => {
   // Función para recuperar contraseña
   const forgotPassword = async (email) => {
     try {
-      await apiRequest('/auth/forgot-password', {
-        method: 'POST',
+      await apiRequest("/auth/forgot-password", {
+        method: "POST",
         body: JSON.stringify({ email }),
       });
 
-      enqueueSnackbar('Instrucciones enviadas a tu email', { variant: 'success' });
+      enqueueSnackbar("Instrucciones enviadas a tu email", {
+        variant: "success",
+      });
     } catch (error) {
-      enqueueSnackbar(error.message, { variant: 'error' });
+      enqueueSnackbar(error.message, { variant: "error" });
       throw error;
     }
   };
@@ -314,21 +321,21 @@ export const AuthProvider = ({ children }) => {
   const verifyToken = async (token) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/verify-token`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Token inválido');
+        throw new Error("Token inválido");
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('Error verificando token:', error);
+      console.error("Error verificando token:", error);
       return null;
     }
   };
@@ -336,11 +343,11 @@ export const AuthProvider = ({ children }) => {
   // Función para refrescar token
   const refreshToken = async () => {
     try {
-      const data = await apiRequest('/auth/refresh', {
-        method: 'POST',
+      const data = await apiRequest("/auth/refresh", {
+        method: "POST",
       });
 
-      localStorage.setItem('token', data.access_token);
+      localStorage.setItem("token", data.access_token);
 
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
@@ -352,7 +359,7 @@ export const AuthProvider = ({ children }) => {
 
       return data.access_token;
     } catch (error) {
-      console.error('Error refrescando token:', error);
+      console.error("Error refrescando token:", error);
       logout();
       return null;
     }
@@ -366,8 +373,8 @@ export const AuthProvider = ({ children }) => {
   // Verificar autenticación al cargar
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
+      const token = localStorage.getItem("token");
+      const userData = localStorage.getItem("user");
 
       if (token && userData) {
         try {
@@ -384,14 +391,14 @@ export const AuthProvider = ({ children }) => {
             });
           } else {
             // Token inválido, limpiar localStorage
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
             dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
           }
         } catch (error) {
-          console.error('Error inicializando auth:', error);
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          console.error("Error inicializando auth:", error);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
       } else {
@@ -426,11 +433,7 @@ export const AuthProvider = ({ children }) => {
     apiRequest,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

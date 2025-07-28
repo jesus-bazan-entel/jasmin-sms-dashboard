@@ -1,8 +1,8 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
-import { useAuth } from './contexts/AuthContext';
-import { useWebSocket } from './contexts/WebSocketContext';
+import React, { Suspense, lazy } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Box, CircularProgress } from "@mui/material";
+import { useAuth } from "./contexts/AuthContext";
+import { useWebSocket } from "./contexts/WebSocketContext";
 
 // Importar todas las páginas desde el archivo index
 import {
@@ -39,7 +39,7 @@ import {
   NotFound,
   Unauthorized,
   ServerError,
-} from './pages';
+} from "./pages";
 
 // Componente de carga
 const LoadingFallback = () => (
@@ -52,7 +52,7 @@ const LoadingFallback = () => (
     gap={2}
   >
     <CircularProgress size={60} thickness={4} />
-    <Box sx={{ color: 'text.secondary', fontSize: '1.1rem' }}>
+    <Box sx={{ color: "text.secondary", fontSize: "1.1rem" }}>
       Cargando Jasmin SMS Dashboard...
     </Box>
   </Box>
@@ -74,11 +74,11 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   if (requiredRole && user?.role !== requiredRole) {
     // Verificar jerarquía de roles
     const roleHierarchy = {
-      'user': 1,
-      'operator': 2,
-      'manager': 3,
-      'admin': 4,
-      'super_admin': 5
+      user: 1,
+      operator: 2,
+      manager: 3,
+      admin: 4,
+      super_admin: 5,
     };
 
     const userRoleLevel = roleHierarchy[user?.role] || 0;
@@ -118,7 +118,7 @@ function App() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "background.default" }}>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           {/* Rutas públicas (solo para usuarios no autenticados) */}
@@ -299,25 +299,30 @@ function App() {
       </Suspense>
 
       {/* Indicador de estado de conexión WebSocket */}
-      {isAuthenticated && connectionStatus !== 'connected' && (
+      {isAuthenticated && connectionStatus !== "connected" && (
         <Box
           sx={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 16,
             right: 16,
-            backgroundColor: connectionStatus === 'connecting' ? 'warning.main' : 'error.main',
-            color: 'white',
-            padding: '8px 16px',
+            backgroundColor:
+              connectionStatus === "connecting" ? "warning.main" : "error.main",
+            color: "white",
+            padding: "8px 16px",
             borderRadius: 1,
-            fontSize: '0.875rem',
+            fontSize: "0.875rem",
             zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1,
           }}
         >
-          {connectionStatus === 'connecting' && <CircularProgress size={16} color="inherit" />}
-          {connectionStatus === 'connecting' ? 'Conectando...' : 'Sin conexión en tiempo real'}
+          {connectionStatus === "connecting" && (
+            <CircularProgress size={16} color="inherit" />
+          )}
+          {connectionStatus === "connecting"
+            ? "Conectando..."
+            : "Sin conexión en tiempo real"}
         </Box>
       )}
     </Box>

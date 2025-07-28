@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   campaigns: [],
@@ -6,8 +6,8 @@ const initialState = {
   loading: false,
   error: null,
   filters: {
-    status: 'all',
-    search: '',
+    status: "all",
+    search: "",
     dateRange: null,
   },
   pagination: {
@@ -18,7 +18,7 @@ const initialState = {
 };
 
 const campaignsSlice = createSlice({
-  name: 'campaigns',
+  name: "campaigns",
   initialState,
   reducers: {
     setLoading: (state, action) => {
@@ -32,13 +32,18 @@ const campaignsSlice = createSlice({
       state.campaigns.unshift(action.payload);
     },
     updateCampaign: (state, action) => {
-      const index = state.campaigns.findIndex(c => c.id === action.payload.id);
+      const index = state.campaigns.findIndex(
+        (c) => c.id === action.payload.id
+      );
       if (index !== -1) {
-        state.campaigns[index] = { ...state.campaigns[index], ...action.payload };
+        state.campaigns[index] = {
+          ...state.campaigns[index],
+          ...action.payload,
+        };
       }
     },
     deleteCampaign: (state, action) => {
-      state.campaigns = state.campaigns.filter(c => c.id !== action.payload);
+      state.campaigns = state.campaigns.filter((c) => c.id !== action.payload);
     },
     setCurrentCampaign: (state, action) => {
       state.currentCampaign = action.payload;

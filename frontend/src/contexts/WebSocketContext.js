@@ -1,13 +1,19 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useAuth } from './AuthContext';
-import { useSnackbar } from 'notistack';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useAuth } from "./AuthContext";
+import { useSnackbar } from "notistack";
 
 // Estados de conexión
 const CONNECTION_STATUS = {
-  CONNECTING: 'connecting',
-  CONNECTED: 'connected',
-  DISCONNECTED: 'disconnected',
-  ERROR: 'error',
+  CONNECTING: "connecting",
+  CONNECTED: "connected",
+  DISCONNECTED: "disconnected",
+  ERROR: "error",
 };
 
 // Contexto
@@ -17,7 +23,7 @@ const WebSocketContext = createContext();
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
-    throw new Error('useWebSocket debe ser usado dentro de WebSocketProvider');
+    throw new Error("useWebSocket debe ser usado dentro de WebSocketProvider");
   }
   return context;
 };
@@ -26,11 +32,13 @@ export const useWebSocket = () => {
 export const WebSocketProvider = ({ children }) => {
   const { user, token, isAuthenticated } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
-  
-  const [connectionStatus, setConnectionStatus] = useState(CONNECTION_STATUS.DISCONNECTED);
+
+  const [connectionStatus, setConnectionStatus] = useState(
+    CONNECTION_STATUS.DISCONNECTED
+  );
   const [lastMessage, setLastMessage] = useState(null);
   const [messageHistory, setMessageHistory] = useState([]);
-  
+
   const wsRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
@@ -38,7 +46,7 @@ export const WebSocketProvider = ({ children }) => {
   const reconnectInterval = 3000; // 3 segundos
 
   // URL del WebSocket
-  const WS_BASE_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:8000/ws';
+  const WS_BASE_URL = process.env.REACT_APP_WS_URL || "ws://localhost:8000/ws";
 
   // Función para conectar WebSocket
   const connect = () => {
@@ -52,19 +60,19 @@ export const WebSocketProvider = ({ children }) => {
 
     try {
       setConnectionStatus(CONNECTION_STATUS.CONNECTING);
-      
+
       // Construir URL con token
       const wsUrl = `${WS_BASE_URL}?token=${token}`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        console.log('WebSocket conectado');
+        console.log("WebSocket conectado");
         setConnectionStatus(CONNECTION_STATUS.CONNECTED);
         reconnectAttemptsRef.current = 0;
-        
+
         // Enviar mensaje de identificación
         sendMessage({
-          type: 'identify',
+          type: "identify",
           data: {
             user_id: user?.id,
             timestamp: new Date().toISOString(),
@@ -75,35 +83,38 @@ export const WebSocketProvider = ({ children }) => {
       wsRef.current.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          console.log('WebSocket mensaje recibido:', message);
-          
+          console.log("WebSocket mensaje recibido:", message);
+
           setLastMessage(message);
-          setMessageHistory(prev => [...prev.slice(-99), message]); // Mantener últimos 100 mensajes
-          
+          setMessageHistory((prev) => [...prev.slice(-99), message]); // Mantener últimos 100 mensajes
+
           // Manejar diferentes tipos de mensajes
           handleMessage(message);
         } catch (error) {
-          console.error('Error parseando mensaje WebSocket:', error);
+          console.error("Error parseando mensaje WebSocket:", error);
         }
       };
 
       wsRef.current.onclose = (event) => {
-        console.log('WebSocket desconectado:', event.code, event.reason);
+        console.log("WebSocket desconectado:", event.code, event.reason);
         setConnectionStatus(CONNECTION_STATUS.DISCONNECTED);
-        
+
         // Intentar reconectar si no fue un cierre intencional
-        if (event.code !== 1000 && isAuthenticated && reconnectAttemptsRef.current < maxReconnectAttempts) {
+        if (
+          event.code !== 1000 &&
+          isAuthenticated &&
+          reconnectAttemptsRef.current < maxReconnectAttempts
+        ) {
           scheduleReconnect();
         }
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('Error en WebSocket:', error);
+        console.error("Error en WebSocket:", error);
         setConnectionStatus(CONNECTION_STATUS.ERROR);
       };
-
     } catch (error) {
-      console.error('Error conectando WebSocket:', error);
+      console.error("Error conectando WebSocket:", error);
       setConnectionStatus(CONNECTION_STATUS.ERROR);
     }
   };
@@ -116,7 +127,7 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     if (wsRef.current) {
-      wsRef.current.close(1000, 'Desconexión intencional');
+      wsRef.current.close(1000, "Desconexión intencional");
       wsRef.current = null;
     }
 
@@ -130,9 +141,12 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     reconnectAttemptsRef.current += 1;
-    const delay = reconnectInterval * Math.pow(2, reconnectAttemptsRef.current - 1); // Backoff exponencial
+    const delay =
+      reconnectInterval * Math.pow(2, reconnectAttemptsRef.current - 1); // Backoff exponencial
 
-    console.log(`Reintentando conexión WebSocket en ${delay}ms (intento ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`);
+    console.log(
+      `Reintentando conexión WebSocket en ${delay}ms (intento ${reconnectAttemptsRef.current}/${maxReconnectAttempts})`
+    );
 
     reconnectTimeoutRef.current = setTimeout(() => {
       if (isAuthenticated) {
@@ -147,14 +161,14 @@ export const WebSocketProvider = ({ children }) => {
       try {
         const messageString = JSON.stringify(message);
         wsRef.current.send(messageString);
-        console.log('WebSocket mensaje enviado:', message);
+        console.log("WebSocket mensaje enviado:", message);
         return true;
       } catch (error) {
-        console.error('Error enviando mensaje WebSocket:', error);
+        console.error("Error enviando mensaje WebSocket:", error);
         return false;
       }
     } else {
-      console.warn('WebSocket no está conectado');
+      console.warn("WebSocket no está conectado");
       return false;
     }
   };
@@ -162,69 +176,69 @@ export const WebSocketProvider = ({ children }) => {
   // Función para manejar mensajes recibidos
   const handleMessage = (message) => {
     switch (message.type) {
-      case 'notification':
+      case "notification":
         handleNotification(message.data);
         break;
-      
-      case 'campaign_update':
+
+      case "campaign_update":
         handleCampaignUpdate(message.data);
         break;
-      
-      case 'message_status':
+
+      case "message_status":
         handleMessageStatus(message.data);
         break;
-      
-      case 'connector_status':
+
+      case "connector_status":
         handleConnectorStatus(message.data);
         break;
-      
-      case 'system_alert':
+
+      case "system_alert":
         handleSystemAlert(message.data);
         break;
-      
-      case 'user_activity':
+
+      case "user_activity":
         handleUserActivity(message.data);
         break;
-      
-      case 'billing_update':
+
+      case "billing_update":
         handleBillingUpdate(message.data);
         break;
-      
+
       default:
-        console.log('Tipo de mensaje WebSocket no manejado:', message.type);
+        console.log("Tipo de mensaje WebSocket no manejado:", message.type);
     }
   };
 
   // Manejadores específicos de mensajes
   const handleNotification = (data) => {
-    const { title, message, type = 'info', persistent = false } = data;
-    
+    const { title, message, type = "info", persistent = false } = data;
+
     enqueueSnackbar(message, {
       variant: type,
       persist: persistent,
       anchorOrigin: {
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       },
     });
   };
 
   const handleCampaignUpdate = (data) => {
     // Emitir evento personalizado para que los componentes puedan escuchar
-    window.dispatchEvent(new CustomEvent('campaignUpdate', { detail: data }));
+    window.dispatchEvent(new CustomEvent("campaignUpdate", { detail: data }));
   };
 
   const handleMessageStatus = (data) => {
-    window.dispatchEvent(new CustomEvent('messageStatus', { detail: data }));
+    window.dispatchEvent(new CustomEvent("messageStatus", { detail: data }));
   };
 
   const handleConnectorStatus = (data) => {
-    window.dispatchEvent(new CustomEvent('connectorStatus', { detail: data }));
-    
+    window.dispatchEvent(new CustomEvent("connectorStatus", { detail: data }));
+
     // Mostrar notificación si hay cambio de estado crítico
-    if (data.status === 'disconnected' || data.status === 'error') {
+    if (data.status === "disconnected" || data.status === "error") {
       enqueueSnackbar(`Conector ${data.name}: ${data.status}`, {
-        variant: 'warning',
+        variant: "warning",
         persist: true,
       });
     }
@@ -232,27 +246,32 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleSystemAlert = (data) => {
     const { level, message, title } = data;
-    
+
     enqueueSnackbar(`${title}: ${message}`, {
-      variant: level === 'critical' ? 'error' : level === 'warning' ? 'warning' : 'info',
-      persist: level === 'critical',
+      variant:
+        level === "critical"
+          ? "error"
+          : level === "warning"
+          ? "warning"
+          : "info",
+      persist: level === "critical",
     });
   };
 
   const handleUserActivity = (data) => {
     // Solo para administradores
-    if (user?.role === 'admin' || user?.role === 'super_admin') {
-      window.dispatchEvent(new CustomEvent('userActivity', { detail: data }));
+    if (user?.role === "admin" || user?.role === "super_admin") {
+      window.dispatchEvent(new CustomEvent("userActivity", { detail: data }));
     }
   };
 
   const handleBillingUpdate = (data) => {
-    window.dispatchEvent(new CustomEvent('billingUpdate', { detail: data }));
-    
+    window.dispatchEvent(new CustomEvent("billingUpdate", { detail: data }));
+
     // Notificar si hay problemas de crédito
-    if (data.type === 'low_credits') {
-      enqueueSnackbar('Créditos bajos: ' + data.message, {
-        variant: 'warning',
+    if (data.type === "low_credits") {
+      enqueueSnackbar("Créditos bajos: " + data.message, {
+        variant: "warning",
         persist: true,
       });
     }
@@ -261,7 +280,7 @@ export const WebSocketProvider = ({ children }) => {
   // Funciones de suscripción a eventos específicos
   const subscribeTo = (eventType, callback) => {
     sendMessage({
-      type: 'subscribe',
+      type: "subscribe",
       data: {
         event_type: eventType,
         user_id: user?.id,
@@ -269,14 +288,14 @@ export const WebSocketProvider = ({ children }) => {
     });
 
     // Agregar listener para eventos personalizados
-    const eventName = eventType.replace('_', '');
+    const eventName = eventType.replace("_", "");
     window.addEventListener(eventName, callback);
 
     // Retornar función de cleanup
     return () => {
       window.removeEventListener(eventName, callback);
       sendMessage({
-        type: 'unsubscribe',
+        type: "unsubscribe",
         data: {
           event_type: eventType,
           user_id: user?.id,
@@ -286,9 +305,9 @@ export const WebSocketProvider = ({ children }) => {
   };
 
   // Función para obtener estadísticas en tiempo real
-  const requestStats = (statsType = 'dashboard') => {
+  const requestStats = (statsType = "dashboard") => {
     sendMessage({
-      type: 'request_stats',
+      type: "request_stats",
       data: {
         stats_type: statsType,
         user_id: user?.id,
@@ -299,7 +318,7 @@ export const WebSocketProvider = ({ children }) => {
   // Función para enviar heartbeat
   const sendHeartbeat = () => {
     sendMessage({
-      type: 'heartbeat',
+      type: "heartbeat",
       data: {
         timestamp: new Date().toISOString(),
         user_id: user?.id,

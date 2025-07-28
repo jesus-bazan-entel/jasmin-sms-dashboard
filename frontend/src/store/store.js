@@ -1,16 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { combineReducers } from '@reduxjs/toolkit';
+import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "@reduxjs/toolkit";
 
 // Importar slices (reducers)
-import authSlice from './slices/authSlice';
-import dashboardSlice from './slices/dashboardSlice';
-import campaignsSlice from './slices/campaignsSlice';
-import contactsSlice from './slices/contactsSlice';
-import messagesSlice from './slices/messagesSlice';
-import connectorsSlice from './slices/connectorsSlice';
-import templatesSlice from './slices/templatesSlice';
-import billingSlice from './slices/billingSlice';
-import settingsSlice from './slices/settingsSlice';
+import authSlice from "./slices/authSlice";
+import dashboardSlice from "./slices/dashboardSlice";
+import campaignsSlice from "./slices/campaignsSlice";
+import contactsSlice from "./slices/contactsSlice";
+import messagesSlice from "./slices/messagesSlice";
+import connectorsSlice from "./slices/connectorsSlice";
+import templatesSlice from "./slices/templatesSlice";
+import billingSlice from "./slices/billingSlice";
+import settingsSlice from "./slices/settingsSlice";
 
 // Combinar reducers
 const rootReducer = combineReducers({
@@ -35,7 +35,7 @@ export const store = configureStore({
         ignoredPaths: [],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 export default store;

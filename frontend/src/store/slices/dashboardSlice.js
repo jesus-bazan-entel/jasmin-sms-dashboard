@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   stats: {
@@ -13,7 +13,7 @@ const initialState = {
   },
   recentActivity: [],
   systemHealth: {
-    status: 'unknown',
+    status: "unknown",
     connectors: [],
     lastUpdate: null,
   },
@@ -22,7 +22,7 @@ const initialState = {
 };
 
 const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState,
   reducers: {
     setLoading: (state, action) => {

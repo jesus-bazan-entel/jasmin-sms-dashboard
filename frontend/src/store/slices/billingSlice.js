@@ -1,25 +1,49 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  billing: { credits: 0, plan: 'free', usage: 0 },
+  billing: { credits: 0, plan: "free", usage: 0 },
   transactions: [],
   loading: false,
   error: null,
 };
 
 const billingSlice = createSlice({
-  name: 'billing',
+  name: "billing",
   initialState,
   reducers: {
-    setLoading: (state, action) => { state.loading = action.payload; },
-    setBilling: (state, action) => { state.billing = action.payload; state.loading = false; },
-    setTransactions: (state, action) => { state.transactions = action.payload; },
-    addTransaction: (state, action) => { state.transactions.unshift(action.payload); },
-    updateCredits: (state, action) => { state.billing.credits = action.payload; },
-    setError: (state, action) => { state.error = action.payload; state.loading = false; },
-    clearError: (state) => { state.error = null; },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setBilling: (state, action) => {
+      state.billing = action.payload;
+      state.loading = false;
+    },
+    setTransactions: (state, action) => {
+      state.transactions = action.payload;
+    },
+    addTransaction: (state, action) => {
+      state.transactions.unshift(action.payload);
+    },
+    updateCredits: (state, action) => {
+      state.billing.credits = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 });
 
-export const { setLoading, setBilling, setTransactions, addTransaction, updateCredits, setError, clearError } = billingSlice.actions;
+export const {
+  setLoading,
+  setBilling,
+  setTransactions,
+  addTransaction,
+  updateCredits,
+  setError,
+  clearError,
+} = billingSlice.actions;
 export default billingSlice.reducer;

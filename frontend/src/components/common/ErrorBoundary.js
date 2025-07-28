@@ -1,6 +1,6 @@
-import React from 'react';
-import { Box, Typography, Button, Paper } from '@mui/material';
-import { ErrorOutline, Refresh } from '@mui/icons-material';
+import React from "react";
+import { Box, Typography, Button, Paper } from "@mui/material";
+import { ErrorOutline, Refresh } from "@mui/icons-material";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -15,16 +15,16 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Puedes registrar el error en un servicio de logging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
     // Aquí podrías enviar el error a un servicio de monitoreo
     // como Sentry, LogRocket, etc.
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       // Ejemplo: Sentry.captureException(error);
     }
   }
@@ -34,7 +34,7 @@ class ErrorBoundary extends React.Component {
   };
 
   handleGoHome = () => {
-    window.location.href = '/dashboard';
+    window.location.href = "/dashboard";
   };
 
   render() {
@@ -53,25 +53,25 @@ class ErrorBoundary extends React.Component {
             sx={{
               p: 4,
               maxWidth: 600,
-              textAlign: 'center',
+              textAlign: "center",
               borderRadius: 2,
             }}
           >
             <ErrorOutline
               sx={{
                 fontSize: 80,
-                color: 'error.main',
+                color: "error.main",
                 mb: 2,
               }}
             />
-            
+
             <Typography variant="h4" gutterBottom color="error">
               ¡Oops! Algo salió mal
             </Typography>
-            
+
             <Typography variant="body1" color="text.secondary" paragraph>
-              Ha ocurrido un error inesperado en la aplicación. 
-              Nuestro equipo ha sido notificado automáticamente.
+              Ha ocurrido un error inesperado en la aplicación. Nuestro equipo
+              ha sido notificado automáticamente.
             </Typography>
 
             <Box display="flex" gap={2} justifyContent="center" mt={3}>
@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
               >
                 Recargar Página
               </Button>
-              
+
               <Button
                 variant="outlined"
                 onClick={this.handleGoHome}
@@ -93,23 +93,23 @@ class ErrorBoundary extends React.Component {
               </Button>
             </Box>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <Box mt={4} textAlign="left">
                 <Typography variant="h6" color="error" gutterBottom>
                   Detalles del Error (Solo en Desarrollo):
                 </Typography>
-                
+
                 <Paper
                   sx={{
                     p: 2,
-                    bgcolor: 'grey.100',
+                    bgcolor: "grey.100",
                     maxHeight: 300,
-                    overflow: 'auto',
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem',
+                    overflow: "auto",
+                    fontFamily: "monospace",
+                    fontSize: "0.8rem",
                   }}
                 >
-                  <Typography component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
+                  <Typography component="pre" sx={{ whiteSpace: "pre-wrap" }}>
                     {this.state.error && this.state.error.toString()}
                     <br />
                     {this.state.errorInfo.componentStack}
@@ -118,7 +118,12 @@ class ErrorBoundary extends React.Component {
               </Box>
             )}
 
-            <Typography variant="caption" color="text.secondary" display="block" mt={3}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              mt={3}
+            >
               Si el problema persiste, contacta al soporte técnico.
             </Typography>
           </Paper>

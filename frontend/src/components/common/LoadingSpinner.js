@@ -1,11 +1,11 @@
-import React from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import React from "react";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
-const LoadingSpinner = ({ 
-  size = 40, 
-  message = 'Cargando...', 
+const LoadingSpinner = ({
+  size = 40,
+  message = "Cargando...",
   fullScreen = false,
-  color = 'primary' 
+  color = "primary",
 }) => {
   const content = (
     <Box
@@ -16,12 +16,12 @@ const LoadingSpinner = ({
       gap={2}
       sx={{
         ...(fullScreen && {
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
           zIndex: 9999,
         }),
         ...(!fullScreen && {
@@ -31,10 +31,10 @@ const LoadingSpinner = ({
     >
       <CircularProgress size={size} color={color} thickness={4} />
       {message && (
-        <Typography 
-          variant="body2" 
+        <Typography
+          variant="body2"
           color="text.secondary"
-          sx={{ fontSize: '0.9rem', fontWeight: 500 }}
+          sx={{ fontSize: "0.9rem", fontWeight: 500 }}
         >
           {message}
         </Typography>

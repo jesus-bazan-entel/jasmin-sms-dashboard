@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -11,7 +11,7 @@ import {
   LinearProgress,
   Alert,
   Skeleton,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Refresh as RefreshIcon,
   TrendingUp as TrendingUpIcon,
@@ -22,8 +22,8 @@ import {
   Error as ErrorIcon,
   Router as RouterIcon,
   Speed as SpeedIcon,
-} from '@mui/icons-material';
-import { Line, Doughnut, Bar } from 'react-chartjs-2';
+} from "@mui/icons-material";
+import { Line, Doughnut, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -35,16 +35,16 @@ import {
   Legend,
   ArcElement,
   BarElement,
-} from 'chart.js';
-import { useQuery } from 'react-query';
-import { format, subHours, subDays } from 'date-fns';
+} from "chart.js";
+import { useQuery } from "react-query";
+import { format, subHours, subDays } from "date-fns";
 
 // Context hooks
-import { useWebSocket } from '../../contexts/WebSocketContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useWebSocket } from "../../contexts/WebSocketContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 // API services
-import { dashboardApi } from '../../services/api';
+import { dashboardApi } from "../../services/api";
 
 // Types
 interface DashboardMetrics {
@@ -66,7 +66,7 @@ interface ConnectorStatus {
   id: string;
   cid: string;
   label: string;
-  status: 'started' | 'stopped' | 'bound' | 'error';
+  status: "started" | "stopped" | "bound" | "error";
   messagesSent: number;
   messagesReceived: number;
   lastActivity?: string;
@@ -97,7 +97,8 @@ ChartJS.register(
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { socket, isConnected } = useWebSocket();
-  const [realtimeMetrics, setRealtimeMetrics] = useState<RealtimeMetrics | null>(null);
+  const [realtimeMetrics, setRealtimeMetrics] =
+    useState<RealtimeMetrics | null>(null);
   const [hourlyData, setHourlyData] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -107,14 +108,13 @@ const DashboardPage: React.FC = () => {
     isLoading,
     error,
     refetch,
-  } = useQuery<DashboardMetrics>('dashboard-metrics', dashboardApi.getMetrics, {
+  } = useQuery<DashboardMetrics>("dashboard-metrics", dashboardApi.getMetrics, {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  const {
-    data: connectorsData,
-    isLoading: connectorsLoading,
-  } = useQuery<ConnectorStatus[]>('connectors-status', dashboardApi.getConnectorsStatus, {
+  const { data: connectorsData, isLoading: connectorsLoading } = useQuery<
+    ConnectorStatus[]
+  >("connectors-status", dashboardApi.getConnectorsStatus, {
     refetchInterval: 10000, // Refetch every 10 seconds
   });
 
@@ -123,46 +123,49 @@ const DashboardPage: React.FC = () => {
     if (!socket || !isConnected) return;
 
     // Subscribe to real-time channels
-    socket.emit('subscribe', {
-      type: 'subscribe',
-      channels: ['metrics', 'connectors', 'campaigns', 'alerts'],
+    socket.emit("subscribe", {
+      type: "subscribe",
+      channels: ["metrics", "connectors", "campaigns", "alerts"],
     });
 
     // Handle metrics updates
-    socket.on('metrics_update', (data: RealtimeMetrics) => {
+    socket.on("metrics_update", (data: RealtimeMetrics) => {
       setRealtimeMetrics(data);
-      
+
       // Update hourly data for charts
-      setHourlyData(prev => {
-        const newData = [...prev, {
-          time: format(new Date(data.timestamp), 'HH:mm'),
-          sent: data.messagesSent,
-          delivered: data.messagesDelivered,
-          failed: data.messagesFailed,
-          throughput: data.throughput,
-        }];
-        
+      setHourlyData((prev) => {
+        const newData = [
+          ...prev,
+          {
+            time: format(new Date(data.timestamp), "HH:mm"),
+            sent: data.messagesSent,
+            delivered: data.messagesDelivered,
+            failed: data.messagesFailed,
+            throughput: data.throughput,
+          },
+        ];
+
         // Keep only last 24 hours
         return newData.slice(-24);
       });
     });
 
     // Handle connector updates
-    socket.on('connector_update', (data: any) => {
+    socket.on("connector_update", (data: any) => {
       // Update connector status in real-time
-      console.log('Connector update:', data);
+      console.log("Connector update:", data);
     });
 
     // Handle alerts
-    socket.on('alert', (data: any) => {
+    socket.on("alert", (data: any) => {
       // Handle system alerts
-      console.log('System alert:', data);
+      console.log("System alert:", data);
     });
 
     return () => {
-      socket.off('metrics_update');
-      socket.off('connector_update');
-      socket.off('alert');
+      socket.off("metrics_update");
+      socket.off("connector_update");
+      socket.off("alert");
     };
   }, [socket, isConnected]);
 
@@ -174,34 +177,34 @@ const DashboardPage: React.FC = () => {
 
   // Chart configurations
   const messagesTrendData = {
-    labels: hourlyData.map(d => d.time),
+    labels: hourlyData.map((d) => d.time),
     datasets: [
       {
-        label: 'Messages Sent',
-        data: hourlyData.map(d => d.sent),
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        label: "Messages Sent",
+        data: hourlyData.map((d) => d.sent),
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.1,
       },
       {
-        label: 'Messages Delivered',
-        data: hourlyData.map(d => d.delivered),
-        borderColor: 'rgb(54, 162, 235)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        label: "Messages Delivered",
+        data: hourlyData.map((d) => d.delivered),
+        borderColor: "rgb(54, 162, 235)",
+        backgroundColor: "rgba(54, 162, 235, 0.2)",
         tension: 0.1,
       },
       {
-        label: 'Messages Failed',
-        data: hourlyData.map(d => d.failed),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        label: "Messages Failed",
+        data: hourlyData.map((d) => d.failed),
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
         tension: 0.1,
       },
     ],
   };
 
   const deliveryStatusData = {
-    labels: ['Delivered', 'Failed', 'Pending'],
+    labels: ["Delivered", "Failed", "Pending"],
     datasets: [
       {
         data: [
@@ -210,14 +213,14 @@ const DashboardPage: React.FC = () => {
           dashboardData?.messagesPending || 0,
         ],
         backgroundColor: [
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(255, 206, 86, 0.8)',
+          "rgba(75, 192, 192, 0.8)",
+          "rgba(255, 99, 132, 0.8)",
+          "rgba(255, 206, 86, 0.8)",
         ],
         borderColor: [
-          'rgba(75, 192, 192, 1)',
-          'rgba(255, 99, 132, 1)',
-          'rgba(255, 206, 86, 1)',
+          "rgba(75, 192, 192, 1)",
+          "rgba(255, 99, 132, 1)",
+          "rgba(255, 206, 86, 1)",
         ],
         borderWidth: 1,
       },
@@ -225,13 +228,13 @@ const DashboardPage: React.FC = () => {
   };
 
   const throughputData = {
-    labels: hourlyData.map(d => d.time),
+    labels: hourlyData.map((d) => d.time),
     datasets: [
       {
-        label: 'Messages/Minute',
-        data: hourlyData.map(d => d.throughput),
-        backgroundColor: 'rgba(153, 102, 255, 0.8)',
-        borderColor: 'rgba(153, 102, 255, 1)',
+        label: "Messages/Minute",
+        data: hourlyData.map((d) => d.throughput),
+        backgroundColor: "rgba(153, 102, 255, 0.8)",
+        borderColor: "rgba(153, 102, 255, 1)",
         borderWidth: 1,
       },
     ],
@@ -241,7 +244,7 @@ const DashboardPage: React.FC = () => {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: "top" as const,
       },
     },
     scales: {
@@ -264,15 +267,20 @@ const DashboardPage: React.FC = () => {
   return (
     <Box p={3}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" component="h1">
           Dashboard
         </Typography>
         <Box display="flex" alignItems="center" gap={2}>
           <Chip
             icon={isConnected ? <CheckCircleIcon /> : <ErrorIcon />}
-            label={isConnected ? 'Connected' : 'Disconnected'}
-            color={isConnected ? 'success' : 'error'}
+            label={isConnected ? "Connected" : "Disconnected"}
+            color={isConnected ? "success" : "error"}
             size="small"
           />
           <IconButton onClick={handleRefresh} disabled={refreshing}>
@@ -287,9 +295,17 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
-                  <Typography color="textSecondary" gutterBottom variant="body2">
+                  <Typography
+                    color="textSecondary"
+                    gutterBottom
+                    variant="body2"
+                  >
                     Total Messages
                   </Typography>
                   {isLoading ? (
@@ -318,9 +334,17 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
-                  <Typography color="textSecondary" gutterBottom variant="body2">
+                  <Typography
+                    color="textSecondary"
+                    gutterBottom
+                    variant="body2"
+                  >
                     Delivery Rate
                   </Typography>
                   {isLoading ? (
@@ -346,16 +370,25 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
-                  <Typography color="textSecondary" gutterBottom variant="body2">
+                  <Typography
+                    color="textSecondary"
+                    gutterBottom
+                    variant="body2"
+                  >
                     Active Connectors
                   </Typography>
                   {isLoading ? (
                     <Skeleton width={80} height={32} />
                   ) : (
                     <Typography variant="h5" component="div">
-                      {dashboardData?.activeConnectors || 0} / {dashboardData?.totalConnectors || 0}
+                      {dashboardData?.activeConnectors || 0} /{" "}
+                      {dashboardData?.totalConnectors || 0}
                     </Typography>
                   )}
                 </Box>
@@ -365,7 +398,9 @@ const DashboardPage: React.FC = () => {
                 variant="determinate"
                 value={
                   dashboardData?.totalConnectors
-                    ? (dashboardData.activeConnectors / dashboardData.totalConnectors) * 100
+                    ? (dashboardData.activeConnectors /
+                        dashboardData.totalConnectors) *
+                      100
                     : 0
                 }
                 sx={{ mt: 1 }}
@@ -378,16 +413,26 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
-                  <Typography color="textSecondary" gutterBottom variant="body2">
+                  <Typography
+                    color="textSecondary"
+                    gutterBottom
+                    variant="body2"
+                  >
                     Throughput
                   </Typography>
                   {isLoading ? (
                     <Skeleton width={80} height={32} />
                   ) : (
                     <Typography variant="h5" component="div">
-                      {realtimeMetrics?.throughput || dashboardData?.throughput || 0}
+                      {realtimeMetrics?.throughput ||
+                        dashboardData?.throughput ||
+                        0}
                     </Typography>
                   )}
                   <Typography variant="body2" color="textSecondary">
@@ -413,7 +458,12 @@ const DashboardPage: React.FC = () => {
               {hourlyData.length > 0 ? (
                 <Line data={messagesTrendData} options={chartOptions} />
               ) : (
-                <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height={300}
+                >
                   <Typography color="textSecondary">
                     No data available. Messages will appear here in real-time.
                   </Typography>
@@ -451,7 +501,12 @@ const DashboardPage: React.FC = () => {
               {hourlyData.length > 0 ? (
                 <Bar data={throughputData} options={chartOptions} />
               ) : (
-                <Box display="flex" justifyContent="center" alignItems="center" height={300}>
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  height={300}
+                >
                   <Typography color="textSecondary">
                     Throughput data will appear here in real-time.
                   </Typography>
@@ -472,16 +527,20 @@ const DashboardPage: React.FC = () => {
               </Typography>
               {connectorsLoading ? (
                 <Box>
-                  {[1, 2, 3].map(i => (
+                  {[1, 2, 3].map((i) => (
                     <Skeleton key={i} height={60} sx={{ mb: 1 }} />
                   ))}
                 </Box>
               ) : connectorsData && connectorsData.length > 0 ? (
                 <Grid container spacing={2}>
-                  {connectorsData.map(connector => (
+                  {connectorsData.map((connector) => (
                     <Grid item xs={12} sm={6} md={4} key={connector.id}>
                       <Paper sx={{ p: 2 }}>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <Box>
                             <Typography variant="subtitle1" fontWeight="bold">
                               {connector.label}
@@ -493,16 +552,21 @@ const DashboardPage: React.FC = () => {
                           <Chip
                             label={connector.status}
                             color={
-                              connector.status === 'bound' || connector.status === 'started'
-                                ? 'success'
-                                : connector.status === 'error'
-                                ? 'error'
-                                : 'default'
+                              connector.status === "bound" ||
+                              connector.status === "started"
+                                ? "success"
+                                : connector.status === "error"
+                                ? "error"
+                                : "default"
                             }
                             size="small"
                           />
                         </Box>
-                        <Box display="flex" justifyContent="space-between" mt={1}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          mt={1}
+                        >
                           <Typography variant="body2">
                             Sent: {connector.messagesSent}
                           </Typography>
@@ -512,7 +576,11 @@ const DashboardPage: React.FC = () => {
                         </Box>
                         {connector.lastActivity && (
                           <Typography variant="caption" color="textSecondary">
-                            Last activity: {format(new Date(connector.lastActivity), 'HH:mm:ss')}
+                            Last activity:{" "}
+                            {format(
+                              new Date(connector.lastActivity),
+                              "HH:mm:ss"
+                            )}
                           </Typography>
                         )}
                       </Paper>
@@ -521,7 +589,8 @@ const DashboardPage: React.FC = () => {
                 </Grid>
               ) : (
                 <Typography color="textSecondary">
-                  No connectors configured. Add your first SMPP connector to get started.
+                  No connectors configured. Add your first SMPP connector to get
+                  started.
                 </Typography>
               )}
             </CardContent>

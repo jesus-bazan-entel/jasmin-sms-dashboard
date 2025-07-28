@@ -1,8 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  theme: 'light',
-  language: 'es',
+  theme: "light",
+  language: "es",
   notifications: {
     email: true,
     push: true,
@@ -17,18 +17,41 @@ const initialState = {
 };
 
 const settingsSlice = createSlice({
-  name: 'settings',
+  name: "settings",
   initialState,
   reducers: {
-    setTheme: (state, action) => { state.theme = action.payload; },
-    setLanguage: (state, action) => { state.language = action.payload; },
-    setNotifications: (state, action) => { state.notifications = { ...state.notifications, ...action.payload }; },
-    setDashboard: (state, action) => { state.dashboard = { ...state.dashboard, ...action.payload }; },
-    setLoading: (state, action) => { state.loading = action.payload; },
-    setError: (state, action) => { state.error = action.payload; state.loading = false; },
-    clearError: (state) => { state.error = null; },
+    setTheme: (state, action) => {
+      state.theme = action.payload;
+    },
+    setLanguage: (state, action) => {
+      state.language = action.payload;
+    },
+    setNotifications: (state, action) => {
+      state.notifications = { ...state.notifications, ...action.payload };
+    },
+    setDashboard: (state, action) => {
+      state.dashboard = { ...state.dashboard, ...action.payload };
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 });
 
-export const { setTheme, setLanguage, setNotifications, setDashboard, setLoading, setError, clearError } = settingsSlice.actions;
+export const {
+  setTheme,
+  setLanguage,
+  setNotifications,
+  setDashboard,
+  setLoading,
+  setError,
+  clearError,
+} = settingsSlice.actions;
 export default settingsSlice.reducer;

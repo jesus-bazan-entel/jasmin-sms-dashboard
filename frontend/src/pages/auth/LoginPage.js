@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -11,7 +11,7 @@ import {
   Divider,
   Link,
   CircularProgress,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
@@ -19,57 +19,57 @@ import {
   Lock,
   Login as LoginIcon,
   Sms,
-} from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
-import { Link as RouterLink } from 'react-router-dom';
+} from "@mui/icons-material";
+import { useAuth } from "../../contexts/AuthContext";
+import { Link as RouterLink } from "react-router-dom";
 
 const LoginPage = () => {
   const { login, loading, error } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Limpiar error del campo cuando el usuario empiece a escribir
     if (formErrors[name]) {
-      setFormErrors(prev => ({
+      setFormErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.email) {
-      errors.email = 'El email es requerido';
+      errors.email = "El email es requerido";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'El email no es válido';
+      errors.email = "El email no es válido";
     }
-    
+
     if (!formData.password) {
-      errors.password = 'La contraseña es requerida';
+      errors.password = "La contraseña es requerida";
     } else if (formData.password.length < 6) {
-      errors.password = 'La contraseña debe tener al menos 6 caracteres';
+      errors.password = "La contraseña debe tener al menos 6 caracteres";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -77,7 +77,7 @@ const LoginPage = () => {
     try {
       await login(formData);
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error("Error en login:", error);
     }
   };
 
@@ -87,9 +87,9 @@ const LoginPage = () => {
 
   // Datos de demostración para testing
   const demoCredentials = [
-    { email: 'admin@jasmin.com', password: 'admin123', role: 'Super Admin' },
-    { email: 'manager@jasmin.com', password: 'manager123', role: 'Manager' },
-    { email: 'operator@jasmin.com', password: 'operator123', role: 'Operator' },
+    { email: "admin@jasmin.com", password: "admin123", role: "Super Admin" },
+    { email: "manager@jasmin.com", password: "manager123", role: "Manager" },
+    { email: "operator@jasmin.com", password: "operator123", role: "Operator" },
   ];
 
   const handleDemoLogin = (credentials) => {
@@ -102,11 +102,11 @@ const LoginPage = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         padding: 2,
       }}
     >
@@ -115,33 +115,38 @@ const LoginPage = () => {
         sx={{
           p: 4,
           maxWidth: 450,
-          width: '100%',
+          width: "100%",
           borderRadius: 3,
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
         }}
       >
         {/* Header */}
         <Box textAlign="center" mb={4}>
           <Box
             sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
               width: 80,
               height: 80,
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              borderRadius: "50%",
+              background: "linear-gradient(45deg, #667eea 30%, #764ba2 90%)",
               mb: 2,
             }}
           >
-            <Sms sx={{ fontSize: 40, color: 'white' }} />
+            <Sms sx={{ fontSize: 40, color: "white" }} />
           </Box>
-          
-          <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
+
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            color="primary"
+            gutterBottom
+          >
             Jasmin SMS Dashboard
           </Typography>
-          
+
           <Typography variant="body1" color="text.secondary">
             Plataforma Empresarial de Marketing SMS
           </Typography>
@@ -180,7 +185,7 @@ const LoginPage = () => {
             fullWidth
             name="password"
             label="Contraseña"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
             error={!!formErrors.password}
@@ -217,13 +222,13 @@ const LoginPage = () => {
             sx={{
               py: 1.5,
               mb: 2,
-              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-              '&:hover': {
-                background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+              background: "linear-gradient(45deg, #667eea 30%, #764ba2 90%)",
+              "&:hover": {
+                background: "linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)",
               },
             }}
           >
-            {loading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+            {loading ? "Iniciando Sesión..." : "Iniciar Sesión"}
           </Button>
 
           {/* Links */}
@@ -232,7 +237,7 @@ const LoginPage = () => {
               component={RouterLink}
               to="/forgot-password"
               variant="body2"
-              sx={{ textDecoration: 'none' }}
+              sx={{ textDecoration: "none" }}
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -247,11 +252,11 @@ const LoginPage = () => {
           {/* Register Link */}
           <Box textAlign="center">
             <Typography variant="body2" color="text.secondary">
-              ¿No tienes una cuenta?{' '}
+              ¿No tienes una cuenta?{" "}
               <Link
                 component={RouterLink}
                 to="/register"
-                sx={{ textDecoration: 'none', fontWeight: 'bold' }}
+                sx={{ textDecoration: "none", fontWeight: "bold" }}
               >
                 Regístrate aquí
               </Link>
@@ -266,7 +271,7 @@ const LoginPage = () => {
               Credenciales de Demostración
             </Typography>
           </Divider>
-          
+
           <Box display="flex" flexDirection="column" gap={1}>
             {demoCredentials.map((cred, index) => (
               <Button
@@ -276,9 +281,9 @@ const LoginPage = () => {
                 onClick={() => handleDemoLogin(cred)}
                 disabled={loading}
                 sx={{
-                  justifyContent: 'flex-start',
-                  textTransform: 'none',
-                  fontSize: '0.75rem',
+                  justifyContent: "flex-start",
+                  textTransform: "none",
+                  fontSize: "0.75rem",
                 }}
               >
                 <Box textAlign="left">
@@ -289,8 +294,13 @@ const LoginPage = () => {
               </Button>
             ))}
           </Box>
-          
-          <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            display="block"
+            mt={1}
+          >
             Haz clic en cualquier credencial para autocompletar el formulario
           </Typography>
         </Box>

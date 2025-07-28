@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -23,7 +23,7 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -34,21 +34,26 @@ import {
   FilterList as FilterIcon,
   Route as RouteIcon,
   TestTube as TestIcon,
-} from '@mui/icons-material';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+} from "@mui/icons-material";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 // API services
-import { routingApi, connectorsApi } from '../../services/api';
+import { routingApi, connectorsApi } from "../../services/api";
 
 // Types
 interface Route {
   id: string;
   order: number;
-  type: 'default' | 'static_mt' | 'random_round_robin' | 'failover';
+  type: "default" | "static_mt" | "random_round_robin" | "failover";
   connectorId: string;
   connectorLabel: string;
   rate: number;
@@ -60,7 +65,7 @@ interface Route {
 interface Filter {
   id: string;
   fid: string;
-  type: 'destination' | 'source' | 'short_code' | 'content' | 'tag' | 'user';
+  type: "destination" | "source" | "short_code" | "content" | "tag" | "user";
   parameter: string;
   value: string;
   isRegex: boolean;
@@ -87,18 +92,21 @@ interface RouteTestResult {
 
 // Form schemas
 const routeSchema = yup.object({
-  type: yup.string().required('Route type is required'),
-  connectorId: yup.string().required('Connector is required'),
-  rate: yup.number().min(0, 'Rate must be positive').required('Rate is required'),
+  type: yup.string().required("Route type is required"),
+  connectorId: yup.string().required("Connector is required"),
+  rate: yup
+    .number()
+    .min(0, "Rate must be positive")
+    .required("Rate is required"),
   filters: yup.array().of(yup.string()),
   description: yup.string(),
 });
 
 const filterSchema = yup.object({
-  fid: yup.string().required('Filter ID is required'),
-  type: yup.string().required('Filter type is required'),
-  parameter: yup.string().required('Parameter is required'),
-  value: yup.string().required('Value is required'),
+  fid: yup.string().required("Filter ID is required"),
+  type: yup.string().required("Filter type is required"),
+  parameter: yup.string().required("Parameter is required"),
+  value: yup.string().required("Value is required"),
   description: yup.string(),
 });
 
@@ -113,24 +121,24 @@ const RoutingPage: React.FC = () => {
 
   // Fetch data
   const { data: routes = [], isLoading: routesLoading } = useQuery<Route[]>(
-    'routes',
+    "routes",
     routingApi.getRoutes
   );
 
   const { data: filters = [], isLoading: filtersLoading } = useQuery<Filter[]>(
-    'filters',
+    "filters",
     routingApi.getFilters
   );
 
   const { data: connectors = [] } = useQuery<Connector[]>(
-    'connectors',
+    "connectors",
     connectorsApi.getConnectors
   );
 
   // Mutations
   const createRouteMutation = useMutation(routingApi.createRoute, {
     onSuccess: () => {
-      queryClient.invalidateQueries('routes');
+      queryClient.invalidateQueries("routes");
       setRouteDialogOpen(false);
       resetRouteForm();
     },
@@ -138,7 +146,7 @@ const RoutingPage: React.FC = () => {
 
   const updateRouteMutation = useMutation(routingApi.updateRoute, {
     onSuccess: () => {
-      queryClient.invalidateQueries('routes');
+      queryClient.invalidateQueries("routes");
       setRouteDialogOpen(false);
       setEditingRoute(null);
       resetRouteForm();
@@ -147,13 +155,13 @@ const RoutingPage: React.FC = () => {
 
   const deleteRouteMutation = useMutation(routingApi.deleteRoute, {
     onSuccess: () => {
-      queryClient.invalidateQueries('routes');
+      queryClient.invalidateQueries("routes");
     },
   });
 
   const createFilterMutation = useMutation(routingApi.createFilter, {
     onSuccess: () => {
-      queryClient.invalidateQueries('filters');
+      queryClient.invalidateQueries("filters");
       setFilterDialogOpen(false);
       resetFilterForm();
     },
@@ -161,7 +169,7 @@ const RoutingPage: React.FC = () => {
 
   const updateFilterMutation = useMutation(routingApi.updateFilter, {
     onSuccess: () => {
-      queryClient.invalidateQueries('filters');
+      queryClient.invalidateQueries("filters");
       setFilterDialogOpen(false);
       setEditingFilter(null);
       resetFilterForm();
@@ -170,7 +178,7 @@ const RoutingPage: React.FC = () => {
 
   const deleteFilterMutation = useMutation(routingApi.deleteFilter, {
     onSuccess: () => {
-      queryClient.invalidateQueries('filters');
+      queryClient.invalidateQueries("filters");
     },
   });
 
@@ -189,11 +197,11 @@ const RoutingPage: React.FC = () => {
   } = useForm({
     resolver: yupResolver(routeSchema),
     defaultValues: {
-      type: 'default',
-      connectorId: '',
+      type: "default",
+      connectorId: "",
       rate: 0,
       filters: [],
-      description: '',
+      description: "",
     },
   });
 
@@ -205,14 +213,14 @@ const RoutingPage: React.FC = () => {
   } = useForm({
     resolver: yupResolver(filterSchema),
     defaultValues: {
-      fid: '',
-      type: 'destination',
-      parameter: '',
-      value: '',
+      fid: "",
+      type: "destination",
+      parameter: "",
+      value: "",
       isRegex: false,
       isCaseSensitive: true,
       negate: false,
-      description: '',
+      description: "",
     },
   });
 
@@ -222,10 +230,10 @@ const RoutingPage: React.FC = () => {
     formState: { errors: testErrors },
   } = useForm({
     defaultValues: {
-      from: '',
-      to: '',
-      content: '',
-      userId: '',
+      from: "",
+      to: "",
+      content: "",
+      userId: "",
     },
   });
 
@@ -245,9 +253,9 @@ const RoutingPage: React.FC = () => {
           order: index + 1,
         }))
       );
-      queryClient.invalidateQueries('routes');
+      queryClient.invalidateQueries("routes");
     } catch (error) {
-      console.error('Failed to reorder routes:', error);
+      console.error("Failed to reorder routes:", error);
     }
   };
 
@@ -279,7 +287,7 @@ const RoutingPage: React.FC = () => {
       connectorId: route.connectorId,
       rate: route.rate,
       filters: route.filters,
-      description: route.description || '',
+      description: route.description || "",
     });
     setRouteDialogOpen(true);
   };
@@ -294,19 +302,19 @@ const RoutingPage: React.FC = () => {
       isRegex: filter.isRegex,
       isCaseSensitive: filter.isCaseSensitive,
       negate: filter.negate,
-      description: filter.description || '',
+      description: filter.description || "",
     });
     setFilterDialogOpen(true);
   };
 
   const handleDeleteRoute = (routeId: string) => {
-    if (window.confirm('Are you sure you want to delete this route?')) {
+    if (window.confirm("Are you sure you want to delete this route?")) {
       deleteRouteMutation.mutate(routeId);
     }
   };
 
   const handleDeleteFilter = (filterId: string) => {
-    if (window.confirm('Are you sure you want to delete this filter?')) {
+    if (window.confirm("Are you sure you want to delete this filter?")) {
       deleteFilterMutation.mutate(filterId);
     }
   };
@@ -314,7 +322,12 @@ const RoutingPage: React.FC = () => {
   return (
     <Box p={3}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h4" component="h1">
           Routing & Filtering
         </Typography>
@@ -352,14 +365,16 @@ const RoutingPage: React.FC = () => {
                 Message Routes
               </Typography>
               <Typography variant="body2" color="textSecondary" mb={2}>
-                Drag and drop to reorder routes. Routes are processed in order from top to bottom.
+                Drag and drop to reorder routes. Routes are processed in order
+                from top to bottom.
               </Typography>
 
               {routesLoading ? (
                 <Typography>Loading routes...</Typography>
               ) : routes.length === 0 ? (
                 <Alert severity="info">
-                  No routes configured. Create your first route to start routing messages.
+                  No routes configured. Create your first route to start routing
+                  messages.
                 </Alert>
               ) : (
                 <DragDropContext onDragEnd={handleRouteDragEnd}>
@@ -367,7 +382,11 @@ const RoutingPage: React.FC = () => {
                     {(provided) => (
                       <div {...provided.droppableProps} ref={provided.innerRef}>
                         {routes.map((route, index) => (
-                          <Draggable key={route.id} draggableId={route.id} index={index}>
+                          <Draggable
+                            key={route.id}
+                            draggableId={route.id}
+                            index={index}
+                          >
                             {(provided, snapshot) => (
                               <Paper
                                 ref={provided.innerRef}
@@ -375,42 +394,69 @@ const RoutingPage: React.FC = () => {
                                 sx={{
                                   p: 2,
                                   mb: 2,
-                                  backgroundColor: snapshot.isDragging ? 'action.hover' : 'background.paper',
-                                  border: route.isActive ? '2px solid' : '1px solid',
-                                  borderColor: route.isActive ? 'success.main' : 'divider',
+                                  backgroundColor: snapshot.isDragging
+                                    ? "action.hover"
+                                    : "background.paper",
+                                  border: route.isActive
+                                    ? "2px solid"
+                                    : "1px solid",
+                                  borderColor: route.isActive
+                                    ? "success.main"
+                                    : "divider",
                                 }}
                               >
                                 <Box display="flex" alignItems="center" gap={2}>
                                   <div {...provided.dragHandleProps}>
                                     <DragIcon color="action" />
                                   </div>
-                                  
+
                                   <Box flex={1}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={1}>
-                                      <Typography variant="subtitle1" fontWeight="bold">
+                                    <Box
+                                      display="flex"
+                                      alignItems="center"
+                                      gap={1}
+                                      mb={1}
+                                    >
+                                      <Typography
+                                        variant="subtitle1"
+                                        fontWeight="bold"
+                                      >
                                         #{route.order} - {route.connectorLabel}
                                       </Typography>
                                       <Chip
-                                        label={route.type.replace('_', ' ').toUpperCase()}
+                                        label={route.type
+                                          .replace("_", " ")
+                                          .toUpperCase()}
                                         size="small"
                                         color="primary"
                                       />
                                       <Chip
-                                        label={route.isActive ? 'Active' : 'Inactive'}
+                                        label={
+                                          route.isActive ? "Active" : "Inactive"
+                                        }
                                         size="small"
-                                        color={route.isActive ? 'success' : 'default'}
+                                        color={
+                                          route.isActive ? "success" : "default"
+                                        }
                                       />
                                     </Box>
-                                    
-                                    <Typography variant="body2" color="textSecondary">
+
+                                    <Typography
+                                      variant="body2"
+                                      color="textSecondary"
+                                    >
                                       Rate: ${route.rate} per message
                                     </Typography>
-                                    
+
                                     {route.filters.length > 0 && (
                                       <Box display="flex" gap={1} mt={1}>
-                                        <Typography variant="caption">Filters:</Typography>
+                                        <Typography variant="caption">
+                                          Filters:
+                                        </Typography>
                                         {route.filters.map((filterId) => {
-                                          const filter = filters.find(f => f.id === filterId);
+                                          const filter = filters.find(
+                                            (f) => f.id === filterId
+                                          );
                                           return filter ? (
                                             <Chip
                                               key={filterId}
@@ -422,14 +468,18 @@ const RoutingPage: React.FC = () => {
                                         })}
                                       </Box>
                                     )}
-                                    
+
                                     {route.description && (
-                                      <Typography variant="body2" color="textSecondary" mt={1}>
+                                      <Typography
+                                        variant="body2"
+                                        color="textSecondary"
+                                        mt={1}
+                                      >
                                         {route.description}
                                       </Typography>
                                     )}
                                   </Box>
-                                  
+
                                   <Box display="flex" gap={1}>
                                     <Tooltip title="Edit Route">
                                       <IconButton
@@ -443,7 +493,9 @@ const RoutingPage: React.FC = () => {
                                       <IconButton
                                         size="small"
                                         color="error"
-                                        onClick={() => handleDeleteRoute(route.id)}
+                                        onClick={() =>
+                                          handleDeleteRoute(route.id)
+                                        }
                                       >
                                         <DeleteIcon />
                                       </IconButton>
@@ -472,22 +524,33 @@ const RoutingPage: React.FC = () => {
                 Message Filters
               </Typography>
               <Typography variant="body2" color="textSecondary" mb={2}>
-                Create filters to control message routing based on various criteria.
+                Create filters to control message routing based on various
+                criteria.
               </Typography>
 
               {filtersLoading ? (
                 <Typography>Loading filters...</Typography>
               ) : filters.length === 0 ? (
                 <Alert severity="info">
-                  No filters configured. Create filters to control message routing.
+                  No filters configured. Create filters to control message
+                  routing.
                 </Alert>
               ) : (
                 <Box>
                   {filters.map((filter) => (
                     <Paper key={filter.id} sx={{ p: 2, mb: 2 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="start">
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="start"
+                      >
                         <Box flex={1}>
-                          <Box display="flex" alignItems="center" gap={1} mb={1}>
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            gap={1}
+                            mb={1}
+                          >
                             <Typography variant="subtitle2" fontWeight="bold">
                               {filter.fid}
                             </Typography>
@@ -497,35 +560,51 @@ const RoutingPage: React.FC = () => {
                               color="secondary"
                             />
                             <Chip
-                              label={filter.isActive ? 'Active' : 'Inactive'}
+                              label={filter.isActive ? "Active" : "Inactive"}
                               size="small"
-                              color={filter.isActive ? 'success' : 'default'}
+                              color={filter.isActive ? "success" : "default"}
                             />
                           </Box>
-                          
+
                           <Typography variant="body2" color="textSecondary">
                             {filter.parameter}: {filter.value}
                           </Typography>
-                          
+
                           <Box display="flex" gap={1} mt={1}>
                             {filter.isRegex && (
-                              <Chip label="Regex" size="small" variant="outlined" />
+                              <Chip
+                                label="Regex"
+                                size="small"
+                                variant="outlined"
+                              />
                             )}
                             {!filter.isCaseSensitive && (
-                              <Chip label="Case Insensitive" size="small" variant="outlined" />
+                              <Chip
+                                label="Case Insensitive"
+                                size="small"
+                                variant="outlined"
+                              />
                             )}
                             {filter.negate && (
-                              <Chip label="Negated" size="small" variant="outlined" />
+                              <Chip
+                                label="Negated"
+                                size="small"
+                                variant="outlined"
+                              />
                             )}
                           </Box>
-                          
+
                           {filter.description && (
-                            <Typography variant="caption" color="textSecondary" mt={1}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              mt={1}
+                            >
                               {filter.description}
                             </Typography>
                           )}
                         </Box>
-                        
+
                         <Box display="flex" flexDirection="column" gap={1}>
                           <IconButton
                             size="small"
@@ -552,9 +631,14 @@ const RoutingPage: React.FC = () => {
       </Grid>
 
       {/* Route Dialog */}
-      <Dialog open={routeDialogOpen} onClose={() => setRouteDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={routeDialogOpen}
+        onClose={() => setRouteDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {editingRoute ? 'Edit Route' : 'Create New Route'}
+          {editingRoute ? "Edit Route" : "Create New Route"}
         </DialogTitle>
         <form onSubmit={handleRouteSubmit(onRouteSubmit)}>
           <DialogContent>
@@ -569,14 +653,16 @@ const RoutingPage: React.FC = () => {
                       <Select {...field} label="Route Type">
                         <MenuItem value="default">Default</MenuItem>
                         <MenuItem value="static_mt">Static MT</MenuItem>
-                        <MenuItem value="random_round_robin">Random Round Robin</MenuItem>
+                        <MenuItem value="random_round_robin">
+                          Random Round Robin
+                        </MenuItem>
                         <MenuItem value="failover">Failover</MenuItem>
                       </Select>
                     </FormControl>
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="connectorId"
@@ -595,7 +681,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="rate"
@@ -613,7 +699,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="filters"
@@ -626,11 +712,19 @@ const RoutingPage: React.FC = () => {
                         multiple
                         label="Filters"
                         renderValue={(selected) => (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          <Box
+                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                          >
                             {(selected as string[]).map((value) => {
-                              const filter = filters.find(f => f.id === value);
+                              const filter = filters.find(
+                                (f) => f.id === value
+                              );
                               return (
-                                <Chip key={value} label={filter?.fid || value} size="small" />
+                                <Chip
+                                  key={value}
+                                  label={filter?.fid || value}
+                                  size="small"
+                                />
                               );
                             })}
                           </Box>
@@ -646,7 +740,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Controller
                   name="description"
@@ -669,18 +763,25 @@ const RoutingPage: React.FC = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={createRouteMutation.isLoading || updateRouteMutation.isLoading}
+              disabled={
+                createRouteMutation.isLoading || updateRouteMutation.isLoading
+              }
             >
-              {editingRoute ? 'Update' : 'Create'}
+              {editingRoute ? "Update" : "Create"}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
       {/* Filter Dialog */}
-      <Dialog open={filterDialogOpen} onClose={() => setFilterDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={filterDialogOpen}
+        onClose={() => setFilterDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {editingFilter ? 'Edit Filter' : 'Create New Filter'}
+          {editingFilter ? "Edit Filter" : "Create New Filter"}
         </DialogTitle>
         <form onSubmit={handleFilterSubmit(onFilterSubmit)}>
           <DialogContent>
@@ -700,7 +801,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="type"
@@ -720,7 +821,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="parameter"
@@ -736,7 +837,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="value"
@@ -752,7 +853,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Controller
                   name="description"
@@ -768,7 +869,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Box display="flex" gap={2}>
                   <Controller
@@ -781,7 +882,7 @@ const RoutingPage: React.FC = () => {
                       />
                     )}
                   />
-                  
+
                   <Controller
                     name="isCaseSensitive"
                     control={filterControl}
@@ -792,7 +893,7 @@ const RoutingPage: React.FC = () => {
                       />
                     )}
                   />
-                  
+
                   <Controller
                     name="negate"
                     control={filterControl}
@@ -812,16 +913,23 @@ const RoutingPage: React.FC = () => {
             <Button
               type="submit"
               variant="contained"
-              disabled={createFilterMutation.isLoading || updateFilterMutation.isLoading}
+              disabled={
+                createFilterMutation.isLoading || updateFilterMutation.isLoading
+              }
             >
-              {editingFilter ? 'Update' : 'Create'}
+              {editingFilter ? "Update" : "Create"}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
       {/* Route Test Dialog */}
-      <Dialog open={testDialogOpen} onClose={() => setTestDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={testDialogOpen}
+        onClose={() => setTestDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Test Message Routing</DialogTitle>
         <form onSubmit={handleTestSubmit(onTestSubmit)}>
           <DialogContent>
@@ -840,7 +948,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <Controller
                   name="to"
@@ -855,7 +963,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Controller
                   name="content"
@@ -872,7 +980,7 @@ const RoutingPage: React.FC = () => {
                   )}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <Controller
                   name="userId"
@@ -888,24 +996,25 @@ const RoutingPage: React.FC = () => {
                 />
               </Grid>
             </Grid>
-            
+
             {testResult && (
               <Box mt={3}>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
                   Test Result
                 </Typography>
-                
+
                 {testResult.matchedRoute ? (
                   <Alert severity="success" sx={{ mb: 2 }}>
-                    Message would be routed to: <strong>{testResult.matchedRoute.connectorLabel}</strong>
+                    Message would be routed to:{" "}
+                    <strong>{testResult.matchedRoute.connectorLabel}</strong>
                   </Alert>
                 ) : (
                   <Alert severity="warning" sx={{ mb: 2 }}>
                     No matching route found. Message would be rejected.
                   </Alert>
                 )}
-                
+
                 {testResult.matchedFilters.length > 0 && (
                   <Box>
                     <Typography variant="subtitle2" gutterBottom>
