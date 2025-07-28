@@ -1,6 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 import { combineReducers } from '@reduxjs/toolkit';
 
 // Importar slices (reducers)
@@ -13,14 +11,6 @@ import connectorsSlice from './slices/connectorsSlice';
 import templatesSlice from './slices/templatesSlice';
 import billingSlice from './slices/billingSlice';
 import settingsSlice from './slices/settingsSlice';
-
-// Configuración de persistencia
-const persistConfig = {
-  key: 'jasmin-sms-dashboard',
-  storage,
-  whitelist: ['auth', 'settings'], // Solo persistir auth y settings
-  blacklist: ['dashboard', 'campaigns', 'contacts', 'messages'], // No persistir datos temporales
-};
 
 // Combinar reducers
 const rootReducer = combineReducers({
@@ -35,23 +25,17 @@ const rootReducer = combineReducers({
   settings: settingsSlice,
 });
 
-// Aplicar persistencia
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 // Configurar store
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-        ignoredPaths: ['register'],
+        ignoredActions: [],
+        ignoredPaths: [],
       },
     }),
   devTools: process.env.NODE_ENV !== 'production',
 });
-
-// Crear persistor
-export const persistor = persistStore(store);
 
 export default store;

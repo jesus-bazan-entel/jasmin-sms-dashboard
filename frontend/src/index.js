@@ -4,14 +4,13 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import { SnackbarProvider } from 'notistack';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
 
 import App from './App';
-import { store, persistor } from './store/store';
+import { store } from './store/store';
 import { AuthProvider } from './contexts/AuthContext';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import LoadingSpinner from './components/common/LoadingSpinner';
@@ -208,46 +207,44 @@ root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <Provider store={store}>
-        <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-              <SnackbarProvider
-                ref={notistackRef}
-                maxSnack={3}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                action={(key) => (
-                  <button
-                    onClick={onClickDismiss(key)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      padding: '4px',
-                    }}
-                  >
-                    ✕
-                  </button>
-                )}
-                dense
-                preventDuplicate
-              >
-                <BrowserRouter>
-                  <AuthProvider>
-                    <WebSocketProvider>
-                      <App />
-                    </WebSocketProvider>
-                  </AuthProvider>
-                </BrowserRouter>
-              </SnackbarProvider>
-            </LocalizationProvider>
-          </ThemeProvider>
-        </PersistGate>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+            <SnackbarProvider
+              ref={notistackRef}
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              action={(key) => (
+                <button
+                  onClick={onClickDismiss(key)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    padding: '4px',
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+              dense
+              preventDuplicate
+            >
+              <BrowserRouter>
+                <AuthProvider>
+                  <WebSocketProvider>
+                    <App />
+                  </WebSocketProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </SnackbarProvider>
+          </LocalizationProvider>
+        </ThemeProvider>
       </Provider>
     </ErrorBoundary>
   </React.StrictMode>
@@ -290,64 +287,6 @@ navigator.serviceWorker?.addEventListener('controllerchange', () => {
   window.location.reload();
 });
 
-// Configuración de desarrollo
-if (process.env.NODE_ENV === 'development') {
-  // Hot Module Replacement
-  if (module.hot) {
-    module.hot.accept('./App', () => {
-      const NextApp = require('./App').default;
-      root.render(
-        <React.StrictMode>
-          <ErrorBoundary>
-            <Provider store={store}>
-              <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
-                <ThemeProvider theme={theme}>
-                  <CssBaseline />
-                  <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-                    <SnackbarProvider
-                      ref={notistackRef}
-                      maxSnack={3}
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      action={(key) => (
-                        <button
-                          onClick={onClickDismiss(key)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'white',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                            padding: '4px',
-                          }}
-                        >
-                          ✕
-                        </button>
-                      )}
-                      dense
-                      preventDuplicate
-                    >
-                      <BrowserRouter>
-                        <AuthProvider>
-                          <WebSocketProvider>
-                            <NextApp />
-                          </WebSocketProvider>
-                        </AuthProvider>
-                      </BrowserRouter>
-                    </SnackbarProvider>
-                  </LocalizationProvider>
-                </ThemeProvider>
-              </PersistGate>
-            </Provider>
-          </ErrorBoundary>
-        </React.StrictMode>
-      );
-    });
-  }
-}
-
 // Configuración global de errores
 window.addEventListener('error', (event) => {
   console.error('Error global:', event.error);
@@ -356,22 +295,5 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Promise rechazada:', event.reason);
 });
-
-// Configuración de performance
-if (process.env.NODE_ENV === 'production') {
-  // Reportar métricas de performance
-  const reportWebVitals = (metric) => {
-    console.log('Web Vital:', metric);
-    // Aquí se pueden enviar métricas a un servicio de analytics
-  };
-  
-  import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-    getCLS(reportWebVitals);
-    getFID(reportWebVitals);
-    getFCP(reportWebVitals);
-    getLCP(reportWebVitals);
-    getTTFB(reportWebVitals);
-  });
-}
 
 console.log('Jasmin SMS Dashboard v2.0.0 - Frontend iniciado');
