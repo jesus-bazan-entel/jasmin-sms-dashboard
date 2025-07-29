@@ -102,11 +102,23 @@ class Settings(BaseSettings):
     @classmethod
     def parse_comma_separated_list(cls, v: Any) -> List[str]:
         if isinstance(v, str):
-            return [host.strip() for host in v.split(",")]
-        return v
+            return [item.strip() for item in v.split(",") if item.strip()]
+        elif isinstance(v, list):
+            return v
+        return []
 
-# Create settings instance
-settings = Settings()
+# Create settings instance with error handling
+try:
+    settings = Settings()
+except Exception as e:
+    print(f"Error loading settings: {e}")
+    # Create settings with defaults if .env fails
+    settings = Settings(
+        SECRET_KEY="fallback-secret-key-change-this",
+        DATABASE_URL="postgresql+asyncpg://jasmin_user:jasmin_password@localhost:5432/jasmin_sms_db",
+        JASMIN_USERNAME="jcliadmin",
+        JASMIN_PASSWORD="jclipwd"
+    )
 
 # Create necessary directories
 def create_directories():

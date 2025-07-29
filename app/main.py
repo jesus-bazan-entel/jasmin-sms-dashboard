@@ -10,7 +10,7 @@ import os
 import logging
 
 # Import core settings and the main API router
-from app.core.config import settings
+from app.core.config_simple import settings
 from app.api.v1.api import api_router
 from app.db.database import engine
 from app.db.base import Base

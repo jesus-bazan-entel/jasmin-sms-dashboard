@@ -11,8 +11,8 @@ def test_imports():
     
     try:
         # Test core config
-        print("  ✓ Testing app.core.config...")
-        from app.core.config import settings
+        print("  ✓ Testing app.core.config_simple...")
+        from app.core.config_simple import settings
         print(f"    App Name: {settings.APP_NAME}")
         
         # Test database
