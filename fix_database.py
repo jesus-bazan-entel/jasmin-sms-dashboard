@@ -11,7 +11,7 @@ from pathlib import Path
 # Agregar el directorio raíz al path
 sys.path.append(str(Path(__file__).parent))
 
-from app.core.database import get_async_session, engine
+from app.core.database import get_db, engine, SessionLocal
 from app.core.security import get_password_hash
 from app.models.user import User, UserRole
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +34,7 @@ async def fix_database():
             print("✅ Tablas creadas correctamente")
         
         # Crear usuario administrador
-        async with get_async_session() as session:
+        async with SessionLocal() as session:
             print("👤 Verificando usuario administrador...")
             
             # Verificar si ya existe
@@ -102,7 +102,7 @@ async def create_demo_users():
     ]
     
     try:
-        async with get_async_session() as session:
+        async with SessionLocal() as session:
             print("👥 Creando usuarios de demostración...")
             
             for user_data in demo_users:

@@ -20,8 +20,8 @@ He corregido el problema en el modelo de datos y creado un script de corrección
 cd /opt/jasmin-sms-dashboard
 source venv/bin/activate
 
-# Ejecutar corrección automática
-python fix_database.py
+# Ejecutar corrección automática (versión simple y robusta)
+python fix_database_simple.py
 ```
 
 **Este script:**
@@ -172,7 +172,7 @@ SQLAlchemy no sabía cuál usar para la relación `routes`, por lo que especific
 ## ⚡ Comando de Corrección Rápida
 
 ```bash
-cd /opt/jasmin-sms-dashboard && source venv/bin/activate && python fix_database.py && ./start_backend.sh
+cd /opt/jasmin-sms-dashboard && source venv/bin/activate && python fix_database_simple.py && ./start_backend.sh
 ```
 
 **¡En 2 minutos tendrás todo funcionando!** 🚀
@@ -194,7 +194,7 @@ CREATE DATABASE jasmin_sms OWNER jasmin_user;
 # Ejecutar corrección
 cd /opt/jasmin-sms-dashboard
 source venv/bin/activate
-python fix_database.py
+python fix_database_simple.py
 ```
 
 ### **Verificar Servicios:**
@@ -216,12 +216,13 @@ sudo systemctl status jasmin
 Después de la corrección:
 
 ```
-🚀 Jasmin SMS Dashboard - Corrección de Base de Datos
-============================================================
-🔧 Iniciando corrección de base de datos...
+🚀 Jasmin SMS Dashboard - Corrección Simple de Base de Datos
+=================================================================
+🔧 Iniciando corrección simple de base de datos...
 📋 Creando tablas...
+✅ Modelos importados correctamente
 ✅ Tablas creadas correctamente
-👤 Verificando usuario administrador...
+👤 Creando usuario administrador...
 ✅ Usuario administrador creado exitosamente
    📧 Email: admin@jasmin.com
    🔑 Password: admin123
@@ -231,8 +232,12 @@ Después de la corrección:
    ✅ Usuario operator@jasmin.com creado
    ✅ Usuario user@jasmin.com creado
 ✅ Usuarios de demostración creados exitosamente
-============================================================
+=================================================================
 🎉 ¡Corrección completada exitosamente!
+
+🚀 Ahora puedes iniciar el backend con:
+   ./start_backend.sh
+   (Seleccionar opción 2 para producción)
 ```
 
 **¡Tu plataforma SMS estará lista para usar!** 📱✨
