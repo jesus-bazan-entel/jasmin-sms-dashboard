@@ -11,6 +11,7 @@ export { default as DashboardLayout } from '../layouts/DashboardLayout';
 
 // Páginas principales - Dashboard real
 export { default as Dashboard } from './Dashboard';
+export { default as CampaignsPage } from './Campaigns';
 
 // Campañas
 export const Campaigns = () => <PlaceholderPage title="Campañas SMS" subtitle="Gestión de campañas de marketing" />;

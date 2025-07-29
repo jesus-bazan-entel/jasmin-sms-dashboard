@@ -11,7 +11,7 @@ import {
   ForgotPasswordPage,
   DashboardLayout,
   Dashboard,
-  Campaigns,
+  CampaignsPage,
   CampaignDetail,
   CreateCampaign,
   Contacts,
@@ -161,7 +161,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
 
             {/* Gestión de campañas */}
-            <Route path="campaigns" element={<Campaigns />} />
+            <Route path="campaigns" element={<CampaignsPage />} />
             <Route path="campaigns/create" element={<CreateCampaign />} />
             <Route path="campaigns/:id" element={<CampaignDetail />} />
 
