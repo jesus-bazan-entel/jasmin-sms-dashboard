@@ -14,8 +14,7 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 
 # Configuration
-pydantic==2.5.0
-pydantic-settings==2.1.0
+pydantic==1.10.15
 
 # HTTP Client
 aiohttp==3.9.1
