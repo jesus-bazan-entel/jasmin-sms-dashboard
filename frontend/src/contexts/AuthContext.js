@@ -25,6 +25,43 @@ const AUTH_ACTIONS = {
   SET_LOADING: "SET_LOADING",
 };
 
+// Credenciales de demostración
+const DEMO_USERS = {
+  'admin@jasmin.com': {
+    id: 1,
+    email: 'admin@jasmin.com',
+    username: 'admin',
+    full_name: 'Administrador del Sistema',
+    role: 'super_admin',
+    password: 'admin123',
+    is_active: true,
+    is_verified: true,
+    created_at: new Date().toISOString(),
+  },
+  'manager@jasmin.com': {
+    id: 2,
+    email: 'manager@jasmin.com',
+    username: 'manager',
+    full_name: 'Manager de Operaciones',
+    role: 'manager',
+    password: 'manager123',
+    is_active: true,
+    is_verified: true,
+    created_at: new Date().toISOString(),
+  },
+  'operator@jasmin.com': {
+    id: 3,
+    email: 'operator@jasmin.com',
+    username: 'operator',
+    full_name: 'Operador SMS',
+    role: 'operator',
+    password: 'operator123',
+    is_active: true,
+    is_verified: true,
+    created_at: new Date().toISOString(),
+  },
+};
+
 // Reducer
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -119,8 +156,21 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // API Base URL
-  const API_BASE_URL =
-    process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+
+  // Función para verificar si el backend está disponible
+  const isBackendAvailable = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        method: 'GET',
+        timeout: 3000, // 3 segundos timeout
+      });
+      return response.ok;
+    } catch (error) {
+      console.log('Backend no disponible, usando modo demo');
+      return false;
+    }
+  };
 
   // Función para hacer peticiones HTTP
   const apiRequest = async (endpoint, options = {}) => {
@@ -153,42 +203,86 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Función de login
+  // Función de login con modo demo
   const login = async (credentials) => {
     dispatch({ type: AUTH_ACTIONS.LOGIN_START });
 
     try {
-      const formData = new FormData();
-      formData.append("username", credentials.email);
-      formData.append("password", credentials.password);
+      // Verificar si el backend está disponible
+      const backendAvailable = await isBackendAvailable();
 
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        body: formData,
-      });
+      if (backendAvailable) {
+        // Modo backend real
+        const formData = new FormData();
+        formData.append("username", credentials.email);
+        formData.append("password", credentials.password);
 
-      const data = await response.json();
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Error al iniciar sesión");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Error al iniciar sesión");
+        }
+
+        // Guardar token en localStorage
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: {
+            user: data.user,
+            token: data.access_token,
+          },
+        });
+
+        enqueueSnackbar("Sesión iniciada correctamente", { variant: "success" });
+        navigate("/dashboard");
+
+        return data;
+      } else {
+        // Modo demo/offline
+        const demoUser = DEMO_USERS[credentials.email];
+        
+        if (!demoUser) {
+          throw new Error("Usuario no encontrado. Use las credenciales de demostración.");
+        }
+
+        if (demoUser.password !== credentials.password) {
+          throw new Error("Contraseña incorrecta");
+        }
+
+        // Crear token demo
+        const demoToken = `demo_token_${Date.now()}_${demoUser.id}`;
+        const userWithoutPassword = { ...demoUser };
+        delete userWithoutPassword.password;
+
+        // Guardar en localStorage
+        localStorage.setItem("token", demoToken);
+        localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+        localStorage.setItem("demo_mode", "true");
+
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: {
+            user: userWithoutPassword,
+            token: demoToken,
+          },
+        });
+
+        enqueueSnackbar(`Bienvenido ${demoUser.full_name} (Modo Demo)`, { 
+          variant: "success",
+          autoHideDuration: 4000,
+        });
+        
+        navigate("/dashboard");
+
+        return { user: userWithoutPassword, access_token: demoToken };
       }
-
-      // Guardar token en localStorage
-      localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      dispatch({
-        type: AUTH_ACTIONS.LOGIN_SUCCESS,
-        payload: {
-          user: data.user,
-          token: data.access_token,
-        },
-      });
-
-      enqueueSnackbar("Sesión iniciada correctamente", { variant: "success" });
-      navigate("/dashboard");
-
-      return data;
     } catch (error) {
       dispatch({
         type: AUTH_ACTIONS.LOGIN_FAILURE,
@@ -204,27 +298,32 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.REGISTER_START });
 
     try {
-      const data = await apiRequest("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+      const backendAvailable = await isBackendAvailable();
 
-      // Guardar token en localStorage
-      localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (backendAvailable) {
+        const data = await apiRequest("/auth/register", {
+          method: "POST",
+          body: JSON.stringify(userData),
+        });
 
-      dispatch({
-        type: AUTH_ACTIONS.REGISTER_SUCCESS,
-        payload: {
-          user: data.user,
-          token: data.access_token,
-        },
-      });
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-      enqueueSnackbar("Cuenta creada correctamente", { variant: "success" });
-      navigate("/dashboard");
+        dispatch({
+          type: AUTH_ACTIONS.REGISTER_SUCCESS,
+          payload: {
+            user: data.user,
+            token: data.access_token,
+          },
+        });
 
-      return data;
+        enqueueSnackbar("Cuenta creada correctamente", { variant: "success" });
+        navigate("/dashboard");
+
+        return data;
+      } else {
+        throw new Error("Registro no disponible en modo demo. Use las credenciales existentes.");
+      }
     } catch (error) {
       dispatch({
         type: AUTH_ACTIONS.REGISTER_FAILURE,
@@ -238,8 +337,10 @@ export const AuthProvider = ({ children }) => {
   // Función de logout
   const logout = async () => {
     try {
-      // Intentar hacer logout en el servidor
-      if (state.token) {
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
+      
+      if (!isDemoMode && state.token) {
+        // Intentar hacer logout en el servidor solo si no es modo demo
         await apiRequest("/auth/logout", {
           method: "POST",
         });
@@ -250,6 +351,7 @@ export const AuthProvider = ({ children }) => {
       // Limpiar localStorage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("demo_mode");
 
       dispatch({ type: AUTH_ACTIONS.LOGOUT });
       enqueueSnackbar("Sesión cerrada", { variant: "info" });
@@ -260,23 +362,36 @@ export const AuthProvider = ({ children }) => {
   // Función para actualizar perfil
   const updateProfile = async (profileData) => {
     try {
-      const data = await apiRequest("/auth/profile", {
-        method: "PUT",
-        body: JSON.stringify(profileData),
-      });
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
 
-      dispatch({
-        type: AUTH_ACTIONS.UPDATE_USER,
-        payload: data,
-      });
+      if (isDemoMode) {
+        // Modo demo: actualizar localmente
+        const updatedUser = { ...state.user, ...profileData };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      // Actualizar localStorage
-      localStorage.setItem("user", JSON.stringify(data));
+        dispatch({
+          type: AUTH_ACTIONS.UPDATE_USER,
+          payload: profileData,
+        });
 
-      enqueueSnackbar("Perfil actualizado correctamente", {
-        variant: "success",
-      });
-      return data;
+        enqueueSnackbar("Perfil actualizado (Modo Demo)", { variant: "success" });
+        return updatedUser;
+      } else {
+        // Modo backend real
+        const data = await apiRequest("/auth/profile", {
+          method: "PUT",
+          body: JSON.stringify(profileData),
+        });
+
+        dispatch({
+          type: AUTH_ACTIONS.UPDATE_USER,
+          payload: data,
+        });
+
+        localStorage.setItem("user", JSON.stringify(data));
+        enqueueSnackbar("Perfil actualizado correctamente", { variant: "success" });
+        return data;
+      }
     } catch (error) {
       enqueueSnackbar(error.message, { variant: "error" });
       throw error;
@@ -286,14 +401,21 @@ export const AuthProvider = ({ children }) => {
   // Función para cambiar contraseña
   const changePassword = async (passwordData) => {
     try {
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
+
+      if (isDemoMode) {
+        enqueueSnackbar("Cambio de contraseña no disponible en modo demo", { 
+          variant: "warning" 
+        });
+        return;
+      }
+
       await apiRequest("/auth/change-password", {
         method: "POST",
         body: JSON.stringify(passwordData),
       });
 
-      enqueueSnackbar("Contraseña cambiada correctamente", {
-        variant: "success",
-      });
+      enqueueSnackbar("Contraseña cambiada correctamente", { variant: "success" });
     } catch (error) {
       enqueueSnackbar(error.message, { variant: "error" });
       throw error;
@@ -303,14 +425,21 @@ export const AuthProvider = ({ children }) => {
   // Función para recuperar contraseña
   const forgotPassword = async (email) => {
     try {
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
+
+      if (isDemoMode) {
+        enqueueSnackbar("Recuperación de contraseña no disponible en modo demo", { 
+          variant: "warning" 
+        });
+        return;
+      }
+
       await apiRequest("/auth/forgot-password", {
         method: "POST",
         body: JSON.stringify({ email }),
       });
 
-      enqueueSnackbar("Instrucciones enviadas a tu email", {
-        variant: "success",
-      });
+      enqueueSnackbar("Instrucciones enviadas a tu email", { variant: "success" });
     } catch (error) {
       enqueueSnackbar(error.message, { variant: "error" });
       throw error;
@@ -320,6 +449,13 @@ export const AuthProvider = ({ children }) => {
   // Función para verificar token
   const verifyToken = async (token) => {
     try {
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
+
+      if (isDemoMode) {
+        // En modo demo, verificar que el token tenga el formato correcto
+        return token && token.startsWith("demo_token_");
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/verify-token`, {
         method: "POST",
         headers: {
@@ -343,6 +479,24 @@ export const AuthProvider = ({ children }) => {
   // Función para refrescar token
   const refreshToken = async () => {
     try {
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
+
+      if (isDemoMode) {
+        // En modo demo, generar nuevo token
+        const newToken = `demo_token_${Date.now()}_${state.user?.id}`;
+        localStorage.setItem("token", newToken);
+
+        dispatch({
+          type: AUTH_ACTIONS.LOGIN_SUCCESS,
+          payload: {
+            user: state.user,
+            token: newToken,
+          },
+        });
+
+        return newToken;
+      }
+
       const data = await apiRequest("/auth/refresh", {
         method: "POST",
       });
@@ -375,30 +529,51 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       const token = localStorage.getItem("token");
       const userData = localStorage.getItem("user");
+      const isDemoMode = localStorage.getItem("demo_mode") === "true";
 
       if (token && userData) {
         try {
           const user = JSON.parse(userData);
-          const isValid = await verifyToken(token);
-
-          if (isValid) {
-            dispatch({
-              type: AUTH_ACTIONS.LOGIN_SUCCESS,
-              payload: {
-                user,
-                token,
-              },
-            });
+          
+          if (isDemoMode) {
+            // Modo demo: verificar token demo
+            if (token.startsWith("demo_token_")) {
+              dispatch({
+                type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                payload: {
+                  user,
+                  token,
+                },
+              });
+            } else {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              localStorage.removeItem("demo_mode");
+              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            }
           } else {
-            // Token inválido, limpiar localStorage
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            // Modo backend: verificar con servidor
+            const isValid = await verifyToken(token);
+
+            if (isValid) {
+              dispatch({
+                type: AUTH_ACTIONS.LOGIN_SUCCESS,
+                payload: {
+                  user,
+                  token,
+                },
+              });
+            } else {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+            }
           }
         } catch (error) {
           console.error("Error inicializando auth:", error);
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          localStorage.removeItem("demo_mode");
           dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
         }
       } else {
@@ -431,6 +606,7 @@ export const AuthProvider = ({ children }) => {
     refreshToken,
     clearError,
     apiRequest,
+    isDemoMode: localStorage.getItem("demo_mode") === "true",
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
