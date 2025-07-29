@@ -1,10 +1,10 @@
 """
-Database configuration and session management
+Database configuration and session management (SQLAlchemy 1.4 compatible)
 """
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import DateTime, func
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, DateTime, func
 from typing import AsyncGenerator
 import logging
 from datetime import datetime
@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 # Create async engine
 engine = create_async_engine(settings.DATABASE_URL, pool_pre_ping=True)
+
+# Create async session factory using the older sessionmaker
 SessionLocal = sessionmaker(
     bind=engine,
     class_=AsyncSession,
@@ -23,34 +25,21 @@ SessionLocal = sessionmaker(
     autoflush=False,
 )
 
-# Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+# Define the Base using the declarative_base function
+Base = declarative_base()
 
-class Base(DeclarativeBase):
-    """Base class for all database models"""
-    
-    # Common columns for all tables
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
-    )
+# NOTE: The common columns (created_at, updated_at) should be added as a mixin
+# or directly in each model file, as the Mapped/mapped_column syntax is not available.
+# For now, we define a simple Base. You must add these fields to your actual models.
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency to get database session"""
-    async with AsyncSessionLocal() as session:
+    # Use the SessionLocal factory created above
+    async with SessionLocal() as session:
         try:
             yield session
+            # The commit is often handled at the endpoint level, not here.
+            # But leaving it for now if it's the intended pattern.
             await session.commit()
         except Exception as e:
             await session.rollback()
@@ -64,7 +53,7 @@ async def init_db():
     async with engine.begin() as conn:
         # Import all models to ensure they are registered
         from app.models import user, campaign, contact, message, billing, connector, route
-        
+
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables created successfully")
