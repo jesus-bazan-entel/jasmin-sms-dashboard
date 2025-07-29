@@ -114,8 +114,7 @@ reportlab==4.0.7
 # QR code generation
 qrcode[pil]==7.4.2
 
-# Webhook validation
-cryptography==41.0.8
+cryptography==41.0.7
 
 # SMS validation
 phonenumbers==8.13.26
@@ -165,8 +164,6 @@ psutil==5.9.6
 # Network utilities
 netifaces==0.11.0
 
-# Encryption
-cryptography==41.0.8
 
 # JWT handling
 pyjwt==2.8.0
