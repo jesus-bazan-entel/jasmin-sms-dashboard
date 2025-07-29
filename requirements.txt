@@ -126,7 +126,7 @@ babel==2.13.1
 jinja2==3.1.2
 
 # HTTP status codes
-http-status==0.2.1
+http-status==0.2.0
 
 # UUID utilities
 shortuuid==1.0.11
