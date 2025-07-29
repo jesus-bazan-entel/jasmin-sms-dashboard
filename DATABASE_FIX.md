@@ -132,9 +132,10 @@ Una vez corregida la base de datos:
 
 ### **Usuarios Creados:**
 - **👑 Super Admin**: admin@jasmin.com / admin123
-- **👔 Manager**: manager@jasmin.com / manager123
-- **🔧 Operator**: operator@jasmin.com / operator123
-- **👤 User**: user@jasmin.com / user123
+- **👔 Admin**: admin2@jasmin.com / admin123
+- **📊 Campaign Manager**: manager@jasmin.com / manager123
+- **📈 Analyst**: analyst@jasmin.com / analyst123
+- **👤 Client**: client@jasmin.com / client123
 
 ---
 

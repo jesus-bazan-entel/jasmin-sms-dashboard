@@ -79,25 +79,32 @@ async def create_demo_users():
     
     demo_users = [
         {
+            "email": "admin@jasmin.com",
+            "username": "admin2",
+            "full_name": "Admin User",
+            "password": "admin123",
+            "role": UserRole.ADMIN
+        },
+        {
             "email": "manager@jasmin.com",
             "username": "manager",
-            "full_name": "Manager User",
+            "full_name": "Campaign Manager",
             "password": "manager123",
-            "role": UserRole.MANAGER
+            "role": UserRole.CAMPAIGN_MANAGER
         },
         {
-            "email": "operator@jasmin.com", 
-            "username": "operator",
-            "full_name": "Operator User",
-            "password": "operator123",
-            "role": UserRole.OPERATOR
+            "email": "analyst@jasmin.com",
+            "username": "analyst",
+            "full_name": "Analyst User",
+            "password": "analyst123",
+            "role": UserRole.ANALYST
         },
         {
-            "email": "user@jasmin.com",
-            "username": "user",
-            "full_name": "Regular User", 
-            "password": "user123",
-            "role": UserRole.USER
+            "email": "client@jasmin.com",
+            "username": "client",
+            "full_name": "Client User",
+            "password": "client123",
+            "role": UserRole.CLIENT
         }
     ]
     

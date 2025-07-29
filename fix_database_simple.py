@@ -74,9 +74,10 @@ async def fix_database():
                 
                 # Crear usuarios adicionales
                 demo_users = [
-                    ("manager@jasmin.com", "manager", "Manager User", "manager123", UserRole.MANAGER),
-                    ("operator@jasmin.com", "operator", "Operator User", "operator123", UserRole.OPERATOR),
-                    ("user@jasmin.com", "user", "Regular User", "user123", UserRole.USER)
+                    ("admin2@jasmin.com", "admin2", "Admin User", "admin123", UserRole.ADMIN),
+                    ("manager@jasmin.com", "manager", "Campaign Manager", "manager123", UserRole.CAMPAIGN_MANAGER),
+                    ("analyst@jasmin.com", "analyst", "Analyst User", "analyst123", UserRole.ANALYST),
+                    ("client@jasmin.com", "client", "Client User", "client123", UserRole.CLIENT)
                 ]
                 
                 print("👥 Creando usuarios de demostración...")
