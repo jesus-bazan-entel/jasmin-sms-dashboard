@@ -22,7 +22,6 @@ import {
   Fab,
   Tooltip,
   Menu,
-  MenuItem,
   ListItemIcon,
   ListItemText,
   Divider,
@@ -45,7 +44,6 @@ import {
   Analytics as AnalyticsIcon,
   Send as SendIcon,
   Article as DraftIcon,
-  CheckCircle,
   CheckCircle as CompletedIcon,
   Error as ErrorIcon,
   Refresh as RefreshIcon
