@@ -156,6 +156,7 @@ class SMPPConnector(Base):
     routes: Mapped[List["Route"]] = relationship(
         "Route",
         back_populates="connector",
+        foreign_keys="Route.connector_id",
         cascade="all, delete-orphan"
     )
     connector_logs: Mapped[List["ConnectorLog"]] = relationship(
