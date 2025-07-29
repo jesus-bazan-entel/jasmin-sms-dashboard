@@ -135,16 +135,6 @@ async def health_check():
         "version": "1.0.0"
     }
 
-# Root endpoint
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "message": "Jasmin SMS Dashboard API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/health"
-    }
 
 # Import and include routers
 try:
