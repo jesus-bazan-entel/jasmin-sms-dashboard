@@ -43,7 +43,7 @@ import {
   Message as MessageIcon,
   Analytics as AnalyticsIcon,
   Send as SendIcon,
-  Draft as DraftIcon,
+  Article as DraftIcon,
   CheckCircle as CompletedIcon,
   Error as ErrorIcon,
   Refresh as RefreshIcon
