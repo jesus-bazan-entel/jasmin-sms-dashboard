@@ -1,3 +1,44 @@
+#!/bin/bash
+
+# Jasmin SMS Dashboard - Fix Campaigns Build Errors
+echo "🔧 Jasmin SMS Dashboard - Fix Campaigns Build Errors"
+echo "===================================================="
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_status "Fixing import errors in CampaignsPage.js..."
+
+# Navigate to frontend directory
+cd frontend
+
+# Create a backup of the original file
+cp src/pages/Campaigns/CampaignsPage.js src/pages/Campaigns/CampaignsPage.js.backup
+
+print_status "Creating corrected version of CampaignsPage.js..."
+
+# Create the corrected file
+cat > src/pages/Campaigns/CampaignsPage.js << 'EOF'
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -45,7 +86,6 @@ import {
   Analytics as AnalyticsIcon,
   Send as SendIcon,
   Article as DraftIcon,
-  CheckCircle,
   CheckCircle as CompletedIcon,
   Error as ErrorIcon,
   Refresh as RefreshIcon
@@ -203,7 +243,7 @@ const CampaignsPage = () => {
   };
 
   const handleStopCampaign = (campaign) => {
-    setCampaignData(prev => prev.map(c =>
+    setCampaignData(prev => prev.map(c => 
       c.id === campaign.id ? { ...c, status: 'stopped' } : c
     ));
     enqueueSnackbar(`Campaña "${campaign.name}" detenida`, { variant: 'error' });
@@ -213,7 +253,7 @@ const CampaignsPage = () => {
   const handleSaveCampaign = (campaignData) => {
     if (selectedCampaign) {
       // Actualizar campaña existente
-      setCampaignData(prev => prev.map(c =>
+      setCampaignData(prev => prev.map(c => 
         c.id === selectedCampaign.id ? { ...campaignData, id: selectedCampaign.id } : c
       ));
     } else {
@@ -361,7 +401,7 @@ const CampaignsPage = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
-                  <CheckCircle />
+                  <CompletedIcon />
                 </Avatar>
                 <Box>
                   <Typography variant="h6">{stats.totalDelivered.toLocaleString()}</Typography>
@@ -429,7 +469,7 @@ const CampaignsPage = () => {
       {/* Tabla de campañas */}
       <Card>
         <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'between', alignItems: 'center', mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6">
               Lista de Campañas
             </Typography>
@@ -622,3 +662,48 @@ const CampaignsPage = () => {
 };
 
 export default CampaignsPage;
+EOF
+
+print_success "✅ CampaignsPage.js corrected"
+
+# Now try to build
+print_status "Building frontend with corrected imports..."
+
+# Clean previous build
+if [ -d "build" ]; then
+    rm -rf build
+fi
+
+# Build with error handling
+GENERATE_SOURCEMAP=false TSC_COMPILE_ON_ERROR=true npm run build
+
+if [ $? -eq 0 ] && [ -d "build" ]; then
+    print_success "✅ Frontend built successfully!"
+    
+    # Show build contents
+    print_status "Build contents:"
+    ls -la build/
+    
+    # Go back to root
+    cd ..
+    
+    print_success "🎉 Campaigns page is ready!"
+    print_status "🌐 Access at: http://190.105.244.174:8000/campaigns"
+    print_status "Now run the login fix script: ./fix_login_error.sh"
+    
+else
+    print_error "❌ Build failed"
+    print_status "Checking for remaining errors..."
+    
+    # Show any remaining errors
+    npm run build 2>&1 | grep -A 5 -B 5 "error\|Error\|ERROR" || echo "No specific errors found"
+    
+    cd ..
+    exit 1
+fi
+EOF
+
+chmod +x fix_campaigns_build.sh
+
+print_success "✅ Build fix script created"
+print_status "Run: ./fix_campaigns_build.sh"
