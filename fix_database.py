@@ -25,7 +25,7 @@ async def fix_database():
     
     try:
         # Crear todas las tablas
-        from app.models import user, connector, campaign, contact, billing, message, template
+        from app.models import user, connector, campaign, contact, billing, message
         from app.core.database import Base
         
         async with engine.begin() as conn:

@@ -29,7 +29,7 @@ async def fix_database():
         async with engine.begin() as conn:
             # Importar todos los modelos para registrarlos
             try:
-                from app.models import user, connector, campaign, contact, billing, message, template
+                from app.models import user, connector, campaign, contact, billing, message
                 print("✅ Modelos importados correctamente")
             except Exception as e:
                 print(f"⚠️  Advertencia importando modelos: {e}")
