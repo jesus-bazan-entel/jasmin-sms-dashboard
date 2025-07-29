@@ -2,7 +2,7 @@
 Configuration settings for Jasmin SMS Dashboard
 """
 
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 from pydantic import Field, validator
 from typing import List, Optional
 import os
