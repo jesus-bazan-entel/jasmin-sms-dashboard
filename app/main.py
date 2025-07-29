@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-import uvicorn
 
 from app.core.config import settings
 from app.core.database import init_db, close_db
@@ -183,11 +182,12 @@ except Exception:
     logger.info("Static files directory not found, skipping static file serving")
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(
-        "main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.DEBUG,
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
         log_level="info"
     )
     
