@@ -1,383 +1,298 @@
-import React, { useEffect, useState } from 'react';
+// Dashboard principal - Copia del archivo original para resolver conflicto de mayúsculas
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
   Card,
   CardContent,
   Typography,
-  Paper,
   LinearProgress,
   Chip,
-  Avatar,
+  IconButton,
+  Paper,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
-  IconButton,
-  Alert,
+  ListItemIcon,
+  Divider
 } from '@mui/material';
 import {
   TrendingUp,
   TrendingDown,
   Message,
+  People,
   Campaign,
-  Contacts,
+  Router,
+  Refresh,
   CheckCircle,
   Error,
-  Schedule,
-  Refresh,
-  Notifications,
-  Send,
-  Receipt,
+  Warning,
+  Info
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
-// Datos de demostración
-const generateDemoStats = () => ({
-  totalMessages: Math.floor(Math.random() * 50000) + 10000,
-  sentMessages: Math.floor(Math.random() * 40000) + 8000,
-  failedMessages: Math.floor(Math.random() * 1000) + 100,
-  pendingMessages: Math.floor(Math.random() * 500) + 50,
-  totalCampaigns: Math.floor(Math.random() * 50) + 10,
-  activeCampaigns: Math.floor(Math.random() * 10) + 2,
-  totalContacts: Math.floor(Math.random() * 10000) + 1000,
-  totalCredits: Math.floor(Math.random() * 5000) + 500,
-  successRate: (Math.random() * 20 + 80).toFixed(1), // 80-100%
-  avgDeliveryTime: (Math.random() * 5 + 2).toFixed(1), // 2-7 segundos
-});
-
-const generateRecentActivity = () => [
-  {
-    id: 1,
-    type: 'campaign',
-    title: 'Campaña "Promoción Verano" completada',
-    description: '2,450 mensajes enviados exitosamente',
-    time: '5 min ago',
-    icon: <Campaign />,
-    color: 'success',
-  },
-  {
-    id: 2,
-    type: 'message',
-    title: 'Mensaje masivo enviado',
-    description: '850 contactos alcanzados',
-    time: '12 min ago',
-    icon: <Send />,
-    color: 'primary',
-  },
-  {
-    id: 3,
-    type: 'error',
-    title: 'Conector SMPP desconectado',
-    description: 'Conector "Provider-1" requiere atención',
-    time: '25 min ago',
-    icon: <Error />,
-    color: 'error',
-  },
-  {
-    id: 4,
-    type: 'contact',
-    title: 'Nuevos contactos importados',
-    description: '125 contactos agregados a la lista "Clientes VIP"',
-    time: '1 hora ago',
-    icon: <Contacts />,
-    color: 'info',
-  },
-  {
-    id: 5,
-    type: 'billing',
-    title: 'Créditos recargados',
-    description: '1,000 créditos SMS agregados',
-    time: '2 horas ago',
-    icon: <Receipt />,
-    color: 'success',
-  },
-];
-
-const StatCard = ({ title, value, subtitle, icon, trend, color = 'primary' }) => (
-  <Card sx={{ height: '100%', position: 'relative', overflow: 'visible' }}>
-    <CardContent>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <Box>
-          <Typography color="text.secondary" gutterBottom variant="body2">
-            {title}
-          </Typography>
-          <Typography variant="h4" component="div" fontWeight="bold">
-            {value}
-          </Typography>
-          {subtitle && (
-            <Typography variant="body2" color="text.secondary">
-              {subtitle}
-            </Typography>
-          )}
-        </Box>
-        <Avatar
-          sx={{
-            bgcolor: `${color}.main`,
-            width: 56,
-            height: 56,
-          }}
-        >
-          {icon}
-        </Avatar>
-      </Box>
-      
-      {trend && (
-        <Box display="flex" alignItems="center" mt={2}>
-          {trend > 0 ? (
-            <TrendingUp color="success" fontSize="small" />
-          ) : (
-            <TrendingDown color="error" fontSize="small" />
-          )}
-          <Typography
-            variant="body2"
-            color={trend > 0 ? 'success.main' : 'error.main'}
-            sx={{ ml: 0.5 }}
-          >
-            {Math.abs(trend)}% vs mes anterior
-          </Typography>
-        </Box>
-      )}
-    </CardContent>
-  </Card>
-);
-
 const Dashboard = () => {
-  const { user, isDemoMode } = useAuth();
-  const [stats, setStats] = useState(generateDemoStats());
-  const [recentActivity] = useState(generateRecentActivity());
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const [metrics, setMetrics] = useState({
+    totalMessages: 0,
+    messagesThisMonth: 0,
+    deliveryRate: 0,
+    activeCampaigns: 0,
+    activeConnectors: 0,
+    creditBalance: 0,
+    lastUpdated: null
+  });
 
-  const refreshStats = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setStats(generateDemoStats());
-      setLoading(false);
-    }, 1000);
-  };
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Simular datos de métricas
   useEffect(() => {
-    // Simular actualización automática cada 30 segundos
-    const interval = setInterval(() => {
-      setStats(generateDemoStats());
-    }, 30000);
+    const loadMetrics = () => {
+      setMetrics({
+        totalMessages: 125847,
+        messagesThisMonth: 8432,
+        deliveryRate: 94.2,
+        activeCampaigns: 12,
+        activeConnectors: 5,
+        creditBalance: 2847.50,
+        lastUpdated: new Date()
+      });
+
+      setRecentActivity([
+        {
+          id: 1,
+          type: 'success',
+          message: 'Campaña "Promoción Verano" completada exitosamente',
+          time: '2 minutos atrás',
+          icon: CheckCircle,
+          color: 'success'
+        },
+        {
+          id: 2,
+          type: 'info',
+          message: 'Nuevo conector SMPP configurado: Proveedor-A',
+          time: '15 minutos atrás',
+          icon: Info,
+          color: 'info'
+        },
+        {
+          id: 3,
+          type: 'warning',
+          message: 'Créditos por debajo del límite mínimo',
+          time: '1 hora atrás',
+          icon: Warning,
+          color: 'warning'
+        },
+        {
+          id: 4,
+          type: 'error',
+          message: 'Fallo en conector SMPP-2: Timeout de conexión',
+          time: '2 horas atrás',
+          icon: Error,
+          color: 'error'
+        }
+      ]);
+
+      setLoading(false);
+    };
+
+    loadMetrics();
+    const interval = setInterval(loadMetrics, 30000); // Actualizar cada 30 segundos
 
     return () => clearInterval(interval);
   }, []);
 
-  const successRate = ((stats.sentMessages / stats.totalMessages) * 100).toFixed(1);
+  const MetricCard = ({ title, value, subtitle, trend, color = 'primary', icon: Icon }) => (
+    <Card sx={{ height: '100%' }}>
+      <CardContent>
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+          <Box>
+            <Typography color="textSecondary" gutterBottom variant="body2">
+              {title}
+            </Typography>
+            <Typography variant="h4" component="div" color={color}>
+              {value}
+            </Typography>
+            {subtitle && (
+              <Typography variant="body2" color="textSecondary">
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+          {Icon && (
+            <Icon sx={{ fontSize: 40, color: `${color}.main`, opacity: 0.7 }} />
+          )}
+        </Box>
+        {trend && (
+          <Box display="flex" alignItems="center" mt={1}>
+            {trend > 0 ? (
+              <TrendingUp sx={{ color: 'success.main', mr: 0.5 }} />
+            ) : (
+              <TrendingDown sx={{ color: 'error.main', mr: 0.5 }} />
+            )}
+            <Typography
+              variant="body2"
+              color={trend > 0 ? 'success.main' : 'error.main'}
+            >
+              {Math.abs(trend)}% vs mes anterior
+            </Typography>
+          </Box>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  if (loading) {
+    return (
+      <Box sx={{ width: '100%', mt: 2 }}>
+        <LinearProgress />
+        <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
+          Cargando dashboard...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box>
+    <Box sx={{ flexGrow: 1, p: 3 }}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            ¡Bienvenido, {user?.full_name || user?.username}!
+          <Typography variant="h4" component="h1" gutterBottom>
+            Dashboard
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Aquí tienes un resumen de tu actividad SMS
+          <Typography variant="subtitle1" color="textSecondary">
+            Bienvenido, {user?.full_name || user?.username || 'Usuario'}
           </Typography>
         </Box>
-        <IconButton 
-          onClick={refreshStats} 
-          disabled={loading}
-          sx={{ 
-            bgcolor: 'primary.main', 
-            color: 'white',
-            '&:hover': { bgcolor: 'primary.dark' }
-          }}
-        >
-          <Refresh />
-        </IconButton>
+        <Box display="flex" alignItems="center" gap={1}>
+          <Chip
+            label={`Última actualización: ${metrics.lastUpdated?.toLocaleTimeString()}`}
+            size="small"
+            variant="outlined"
+          />
+          <IconButton onClick={() => window.location.reload()}>
+            <Refresh />
+          </IconButton>
+        </Box>
       </Box>
 
-      {/* Demo Mode Alert */}
-      {isDemoMode && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <strong>Modo Demostración:</strong> Los datos mostrados son simulados para propósitos de demostración.
-          Para usar datos reales, conecte con el backend de Jasmin SMS Gateway.
-        </Alert>
-      )}
-
-      {/* Loading Bar */}
-      {loading && <LinearProgress sx={{ mb: 2 }} />}
-
-      {/* Stats Cards */}
-      <Grid container spacing={3} mb={4}>
+      {/* Métricas principales */}
+      <Grid container spacing={3} mb={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
+          <MetricCard
             title="Total Mensajes"
-            value={stats.totalMessages.toLocaleString()}
-            subtitle="Este mes"
-            icon={<Message />}
+            value={metrics.totalMessages.toLocaleString()}
+            subtitle="Todos los tiempos"
             trend={12.5}
             color="primary"
+            icon={Message}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Mensajes Enviados"
-            value={stats.sentMessages.toLocaleString()}
-            subtitle={`${successRate}% tasa de éxito`}
-            icon={<CheckCircle />}
+          <MetricCard
+            title="Este Mes"
+            value={metrics.messagesThisMonth.toLocaleString()}
+            subtitle="Mensajes enviados"
             trend={8.2}
             color="success"
+            icon={TrendingUp}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Campañas Activas"
-            value={stats.activeCampaigns}
-            subtitle={`${stats.totalCampaigns} total`}
-            icon={<Campaign />}
-            trend={-2.1}
+          <MetricCard
+            title="Tasa de Entrega"
+            value={`${metrics.deliveryRate}%`}
+            subtitle="Promedio mensual"
+            trend={2.1}
             color="info"
+            icon={CheckCircle}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Créditos SMS"
-            value={stats.totalCredits.toLocaleString()}
-            subtitle="Disponibles"
-            icon={<Receipt />}
-            trend={5.7}
+          <MetricCard
+            title="Créditos"
+            value={`$${metrics.creditBalance.toFixed(2)}`}
+            subtitle="Balance actual"
+            trend={-5.3}
             color="warning"
+            icon={People}
           />
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
-        {/* Performance Overview */}
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight="bold">
-                  Resumen de Performance
-                </Typography>
-                <Chip 
-                  label="Tiempo Real" 
-                  color="success" 
-                  size="small"
-                  icon={<Notifications />}
-                />
-              </Box>
-
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <Box mb={2}>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Tasa de Entrega</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {successRate}%
-                      </Typography>
-                    </Box>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={parseFloat(successRate)} 
-                      sx={{ height: 8, borderRadius: 4 }}
-                    />
-                  </Box>
-
-                  <Box mb={2}>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Mensajes Pendientes</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {stats.pendingMessages}
-                      </Typography>
-                    </Box>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={(stats.pendingMessages / stats.totalMessages) * 100} 
-                      color="warning"
-                      sx={{ height: 8, borderRadius: 4 }}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Mensajes Fallidos</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {stats.failedMessages}
-                      </Typography>
-                    </Box>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={(stats.failedMessages / stats.totalMessages) * 100} 
-                      color="error"
-                      sx={{ height: 8, borderRadius: 4 }}
-                    />
-                  </Box>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Métricas Clave
-                    </Typography>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Tiempo Promedio de Entrega:</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {stats.avgDeliveryTime}s
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Total Contactos:</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {stats.totalContacts.toLocaleString()}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="space-between">
-                      <Typography variant="body2">Conectores Activos:</Typography>
-                      <Typography variant="body2" fontWeight="bold" color="success.main">
-                        3/4
-                      </Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+      {/* Segunda fila de métricas */}
+      <Grid container spacing={3} mb={3}>
+        <Grid item xs={12} sm={6} md={6}>
+          <MetricCard
+            title="Campañas Activas"
+            value={metrics.activeCampaigns}
+            subtitle="En ejecución"
+            color="secondary"
+            icon={Campaign}
+          />
         </Grid>
+        <Grid item xs={12} sm={6} md={6}>
+          <MetricCard
+            title="Conectores SMPP"
+            value={`${metrics.activeConnectors}/8`}
+            subtitle="Conectados"
+            color="success"
+            icon={Router}
+          />
+        </Grid>
+      </Grid>
 
-        {/* Recent Activity */}
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Actividad Reciente
+      {/* Actividad reciente */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Gráfico de Mensajes (Últimos 7 días)
+            </Typography>
+            <Box
+              sx={{
+                height: 300,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'grey.50',
+                borderRadius: 1
+              }}
+            >
+              <Typography color="textSecondary">
+                📊 Gráfico de métricas en tiempo real
+                <br />
+                (Integración con Chart.js pendiente)
               </Typography>
-              <List>
-                {recentActivity.map((activity) => (
-                  <ListItem key={activity.id} sx={{ px: 0 }}>
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: `${activity.color}.main` }}>
-                        {activity.icon}
-                      </Avatar>
-                    </ListItemAvatar>
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Actividad Reciente
+            </Typography>
+            <List dense>
+              {recentActivity.map((activity, index) => (
+                <React.Fragment key={activity.id}>
+                  <ListItem>
+                    <ListItemIcon>
+                      <activity.icon sx={{ color: `${activity.color}.main` }} />
+                    </ListItemIcon>
                     <ListItemText
-                      primary={
-                        <Typography variant="body2" fontWeight="bold">
-                          {activity.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            {activity.description}
-                          </Typography>
-                          <Typography variant="caption" display="block" color="primary">
-                            {activity.time}
-                          </Typography>
-                        </Box>
-                      }
+                      primary={activity.message}
+                      secondary={activity.time}
+                      primaryTypographyProps={{ variant: 'body2' }}
+                      secondaryTypographyProps={{ variant: 'caption' }}
                     />
                   </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
+                  {index < recentActivity.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </List>
+          </Paper>
         </Grid>
       </Grid>
     </Box>
