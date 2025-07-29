@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 import uuid
 
 from app.core.database import get_db
+from app.core.security import get_db 
 from app.core.security import get_current_user, require_permission
 from app.models.user import User
 from app.models.connector import SMPPConnector, Route, Filter, ConnectorLog
@@ -35,7 +36,6 @@ router = APIRouter()
 
 # Initialize services
 jasmin_service = JasminService()
-connector_service = ConnectorService()
 connection_manager = ConnectionManager()
 
 @router.get("/", response_model=ConnectorListResponse)
@@ -540,3 +540,8 @@ async def get_all_connectors_status(
             }
         
         return {"connectors": status_data, "warning": "Real-time status unavailable"}
+
+@router.get("/")
+async def get_connectors(db: AsyncSession = Depends(get_db)):
+    connector_service = ConnectorService(db)
+    return await connector_service.get_all_connectors()

@@ -10,6 +10,7 @@ import uuid
 import enum
 from datetime import datetime, timedelta
 from decimal import Decimal
+from sqlalchemy import Column, DateTime, func
 
 from app.core.database import Base
 
@@ -77,7 +78,7 @@ class BillingPlan(Base):
     trial_days: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    billingplan_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     def __repr__(self):
         return f"<BillingPlan(id={self.id}, name={self.name}, price=${self.monthly_price})>"
@@ -157,6 +158,8 @@ class UserSubscription(Base):
 class BillingTransaction(Base):
     """Individual billing transactions"""
     __tablename__ = "billing_transactions"
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -215,7 +218,7 @@ class BillingTransaction(Base):
     )
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    billingtransaction_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="billing_transactions")
@@ -263,7 +266,7 @@ class CreditPackage(Base):
     expires_after_days: Mapped[Optional[int]] = mapped_column(Integer)
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    creditpackage_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     def __repr__(self):
         return f"<CreditPackage(id={self.id}, name={self.name}, credits={self.credits})>"
@@ -329,7 +332,7 @@ class Invoice(Base):
     
     # Metadata
     notes: Mapped[Optional[str]] = mapped_column(Text)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    invoice_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -373,7 +376,7 @@ class InvoiceItem(Base):
     period_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    invoiceitem_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     invoice: Mapped["Invoice"] = relationship("Invoice", back_populates="invoice_items")
@@ -423,7 +426,7 @@ class UsageRecord(Base):
     )
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    usagerecord_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -473,7 +476,7 @@ class PaymentMethod(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    paymentmthod_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")

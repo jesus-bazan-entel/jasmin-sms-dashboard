@@ -9,6 +9,8 @@ from typing import Optional, List, Dict, Any
 import uuid
 import enum
 from datetime import datetime
+from decimal import Decimal
+from sqlalchemy import Column, DateTime, func
 
 from app.core.database import Base
 
@@ -38,6 +40,8 @@ class MessageDirection(str, enum.Enum):
 class Message(Base):
     """SMS Message model"""
     __tablename__ = "messages"
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -133,7 +137,7 @@ class Message(Base):
     error_message: Mapped[Optional[str]] = mapped_column(String(500))
     
     # Metadata and tracking
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    message_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     tags: Mapped[Optional[List[str]]] = mapped_column(JSONB)
     
     # Click tracking (for URLs in messages)

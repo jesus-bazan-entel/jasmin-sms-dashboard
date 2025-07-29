@@ -1,6 +1,12 @@
 """
 Security utilities for authentication and authorization
 """
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.core.database import SessionLocal
+from app.models.user import User
 
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
@@ -16,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
@@ -98,6 +105,33 @@ def generate_api_key() -> str:
 def generate_webhook_secret() -> str:
     """Generate webhook secret"""
     return secrets.token_urlsafe(24)
+
+# Add this function to get a DB session
+async def get_db() -> AsyncSession:
+    async with SessionLocal() as session:
+        yield session
+
+# This is the main dependency function you are missing
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    result = await db.execute(select(User).where(User.username == username))
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        raise credentials_exception
+    return user
 
 class PermissionChecker:
     """Role-based permission checker"""

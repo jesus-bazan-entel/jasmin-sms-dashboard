@@ -149,7 +149,7 @@ class SMPPConnector(Base):
     
     # Metadata
     tags: Mapped[Optional[List[str]]] = mapped_column(JSONB)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    smppconnector_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -234,7 +234,7 @@ class Route(Base):
     
     # Metadata
     description: Mapped[Optional[str]] = mapped_column(Text)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    route_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -307,7 +307,7 @@ class Filter(Base):
     
     # Metadata
     description: Mapped[Optional[str]] = mapped_column(Text)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    filter_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -461,7 +461,7 @@ class ConnectorGroup(Base):
     )  # round_robin, weighted, failover
     
     # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    connectorgroup_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")

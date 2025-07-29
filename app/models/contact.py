@@ -123,7 +123,7 @@ class Contact(Base):
     
     # Metadata
     notes: Mapped[Optional[str]] = mapped_column(Text)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    contact_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -231,7 +231,7 @@ class ContactList(Base):
     
     # Metadata
     tags: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    contact_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")
@@ -327,7 +327,7 @@ class ContactSegment(Base):
     
     # Metadata
     tags: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    contactsegment_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     
     # Relationships
     user: Mapped["User"] = relationship("User")

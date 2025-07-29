@@ -4,7 +4,7 @@ Database models for Jasmin SMS Dashboard
 
 from .user import User, ApiKey, UserSession, AuditLog, UserRole, UserStatus
 from .campaign import (
-    Campaign, CampaignContact, MessageTemplate, CampaignSchedule, 
+    Campaign, CampaignContact, CampaignSchedule, 
     CampaignAnalytics, CampaignStatus, CampaignType, MessagePriority
 )
 from .contact import (

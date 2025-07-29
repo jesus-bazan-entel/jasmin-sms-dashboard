@@ -140,7 +140,7 @@ class Campaign(Base):
     
     # Metadata
     tags: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
+    campaign_metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
     notes: Mapped[Optional[str]] = mapped_column(Text)
     
     # Relationships
@@ -240,59 +240,6 @@ class CampaignContact(Base):
     def __repr__(self):
         return f"<CampaignContact(campaign_id={self.campaign_id}, contact_id={self.contact_id})>"
 
-class MessageTemplate(Base):
-    """Reusable message templates"""
-    __tablename__ = "message_templates"
-    
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-    )
-    
-    # Template information
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text)
-    
-    # Ownership
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id"),
-        nullable=False
-    )
-    
-    # Template content
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-    variables: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)  # Available variables
-    
-    # Template settings
-    is_public: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    
-    # Usage statistics
-    usage_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    last_used: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
-    
-    # Categorization
-    category: Mapped[Optional[str]] = mapped_column(String(100))
-    tags: Mapped[List[str]] = mapped_column(ARRAY(String), default=list)
-    
-    # Metadata
-    metadata: Mapped[Optional[dict]] = mapped_column(JSONB, default=dict)
-    
-    # Relationships
-    user: Mapped["User"] = relationship("User")
-    
-    def __repr__(self):
-        return f"<MessageTemplate(id={self.id}, name={self.name})>"
-    
-    def render(self, variables: Dict[str, Any]) -> str:
-        """Render template with provided variables"""
-        content = self.content
-        for var_name, var_value in variables.items():
-            placeholder = f"{{{var_name}}}"
-            content = content.replace(placeholder, str(var_value))
-        return content
 
 class CampaignSchedule(Base):
     """Campaign scheduling and recurrence rules"""

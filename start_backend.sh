@@ -131,29 +131,36 @@ fi
 print_status "Verificando conexión a base de datos..."
 if python3 -c "
 import asyncio
-from app.core.database import engine
 from sqlalchemy import text
+from app.core.database import engine
+from dotenv import load_dotenv
+
+# Carga las variables del archivo .env en el entorno
+load_dotenv()
 
 async def test_connection():
     try:
         async with engine.begin() as conn:
             await conn.execute(text('SELECT 1'))
-        print('✅ Conexión a base de datos exitosa')
         return True
     except Exception as e:
-        print(f'❌ Error de conexión: {e}')
+        # Imprime el error real para un mejor diagnóstico
+        print(f'[PYTHON ERROR] {e}')
         return False
 
-result = asyncio.run(test_connection())
-exit(0 if result else 1)
-" 2>/dev/null; then
+# Llama a la función y sal con el código de estado correcto
+if asyncio.run(test_connection()):
+    exit(0)
+else:
+    exit(1)
+"; then
     print_success "Conexión a base de datos exitosa"
 else
     print_error "No se pudo conectar a la base de datos"
     print_warning "Verifica la configuración DATABASE_URL en el archivo .env"
-    print_warning "Ejemplo: postgresql://jasmin_user:password@localhost/jasmin_sms_dashboard"
     exit 1
 fi
+
 
 # Ejecutar migraciones
 print_status "Ejecutando migraciones de base de datos..."
@@ -168,12 +175,12 @@ print_status "Verificando usuario administrador..."
 python3 -c "
 import asyncio
 from app.models.user import User, UserRole
-from app.core.database import AsyncSessionLocal
+from app.core.database import SessionLocal
 from app.core.security import get_password_hash
 from sqlalchemy import select
 
 async def create_admin_if_not_exists():
-    async with AsyncSessionLocal() as db:
+    async with SessionLocal() as db:
         try:
             result = await db.execute(select(User).where(User.email == 'admin@jasmin.com'))
             existing_user = result.scalar_one_or_none()
